@@ -52,7 +52,7 @@ class LayerResolver
 
     public function findActiveLayers(array $layers, RequestInterface $request, bool $checkMethod = true): array
     {
-        $activeLayers = array_filter($layers, function (Layer $layer) use($checkMethod, $request) {
+        $activeLayers = array_filter($layers, function(Layer $layer) use($checkMethod, $request) {
             return $this->isActiveLayer($layer, $request, $checkMethod);
         });
 

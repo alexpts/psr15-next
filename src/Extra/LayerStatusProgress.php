@@ -29,7 +29,7 @@ class LayerStatusProgress
 
         /** @var HttpContext $context */
         $context = $request->getAttribute('context');
-        return $context->replaceState('router.layers.active', array_map(function (array $layer) use ($currentLayer) {
+        return $context->replaceState('router.layers.active', array_map(function(array $layer) use ($currentLayer) {
             $layer['status'] = $currentLayer->name === $layer['name'] ? 'progress' : $layer['status'];
             return $layer;
         }, $context->getState('router.layers.active')));
@@ -41,7 +41,7 @@ class LayerStatusProgress
 
         /** @var HttpContext $context */
         $context = $request->getAttribute('context');
-        return $context->replaceState('router.layers.active', array_map(function (array $layer) use ($currentLayer) {
+        return $context->replaceState('router.layers.active', array_map(function(array $layer) use ($currentLayer) {
             $layer['status'] = $currentLayer->name === $layer['name'] ? 'complete' : $layer['status'];
             return $layer;
         }, $context->getState('router.layers.active')));

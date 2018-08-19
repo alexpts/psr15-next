@@ -31,7 +31,7 @@ class OptionsMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         $activeLayers = $this->findActiveLayersWithoutHttpMethodCheck($request);
-        $supportMethods = array_reduce($activeLayers, function (array $acc, Layer $layer) {
+        $supportMethods = array_reduce($activeLayers, function(array $acc, Layer $layer) {
             if ($layer->type === 'route') {
                 $acc = array_merge($acc, $layer->methods);
             }

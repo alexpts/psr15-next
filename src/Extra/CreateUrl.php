@@ -26,7 +26,7 @@ class CreateUrl
         $prepared = [];
 
         foreach ($placeholders as $name => $value) {
-            $prepared['{' . $name . '}'] = $value;
+            $prepared['{'.$name.'}'] = $value;
         }
 
         return $prepared;

@@ -50,7 +50,7 @@ class Router implements RequestHandlerInterface
 
     public function addLayer(Layer $layer): self
     {
-        $layer->name = $layer->name ?? 'layer-' . $this->autoincrement;
+        $layer->name = $layer->name ?? 'layer-'.$this->autoincrement;
         $layer->makeRegExp($this->resolver);
         $this->layers[] = $layer;
 
@@ -108,7 +108,7 @@ class Router implements RequestHandlerInterface
             }
 
             $clone = clone $layer;
-            $clone->path = $path . $layer->path;
+            $clone->path = $path.$layer->path;
             $this->addLayer($clone);
         }
 
@@ -158,9 +158,9 @@ class Router implements RequestHandlerInterface
         return $request;
     }
 
-    protected function getFullPath(?string $path): ?string
+    protected function getFullPath(string $path = null): ?string
     {
-        return null === $path ? null : $this->prefix . $path;
+        return null === $path ? null : $this->prefix.$path;
     }
 
     protected function method(string $method, string $path, callable $handler, string $name = null): self
