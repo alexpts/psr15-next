@@ -9,4 +9,4 @@
 Router for PSR-15 middlewares. Base for micro framework.
 
 
-https://github.com/alexpts/psr15-next/tree/master/examples
+[See examples](https://github.com/alexpts/psr15-next/tree/master/examples)
