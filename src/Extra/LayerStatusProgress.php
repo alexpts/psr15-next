@@ -13,7 +13,7 @@ class LayerStatusProgress
     public function withActiveLayers(ServerRequestInterface $request, array $allowLayers): void
     {
         $context = $request->getAttribute('context');
-        $context->replaceState('router.layers.active', array_map(function (Layer $layer) {
+        $context->replaceState('router.layers.active', array_map(function(Layer $layer) {
             return [
                 'name' => $layer->name,
                 'type' => $layer->type,
