@@ -8,87 +8,77 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\EventsInterface;
-use PTS\NextRouter\Extra\CreateUrl;
-use PTS\NextRouter\Extra\HttpContext;
 
 class Router implements RequestHandlerInterface
 {
     public const EVENT_BEFORE_HANDLE = 'router.before.handle';
 
-    /** @var LayerResolver */
-    protected $resolver;
-    /** @var string */
-    protected $prefix = '';
-    /** @var array */
-    protected $layers = [];
-    /** @var int */
-    protected $autoincrement = 0;
-    /** @var CreateUrl|null */
-    protected $urlCreator;
-    /** @var EventsInterface */
+    /** @var StoreLayers */
+    protected $store;
+    /** @var EventsInterface|null */
     protected $events;
     /** @var Runner */
     protected $runner;
 
-    public function __construct(LayerResolver $resolver, EventsInterface $events)
+    public function __construct(LayerResolver $resolver = null)
     {
-        $this->resolver = $resolver;
-        $this->events = $events;
-        $this->runner = new Runner($this->events);
+        $resolver = $resolver ?? new LayerResolver;
+        $this->store = new StoreLayers($resolver);
+        $this->runner = new Runner;
     }
 
-    public function setUrlCreator(CreateUrl $urlCreator): self
+    public function setEvents(EventsInterface $events): self
     {
-        $this->urlCreator = $urlCreator;
+        $this->events = $events;
+        $this->runner->setEvents($events);
         return $this;
+    }
+
+    public function getStore(): StoreLayers
+    {
+        return $this->store;
     }
 
     public function use(callable $handler, string $path = null, string $name = null): self
     {
-        return $this->middleware(new CallableToMiddleware($handler), $path, $name);
-    }
-
-    public function addLayer(Layer $layer): self
-    {
-        $layer->name = $layer->name ?? 'layer-'.$this->autoincrement;
-        $layer->makeRegExp($this->resolver);
-        $this->layers[] = $layer;
-
-        $this->autoincrement++;
+        $this->store->middleware(new CallableToMiddleware($handler), $path, $name);
         return $this;
     }
 
     public function middleware(MiddlewareInterface $md, string $path = null, string $name = null): self
     {
-        $layer = $this->makeLayer($md, $path, $name)->setType('middleware');
-        $this->addLayer($layer);
-
+        $this->store->middleware($md, $path, $name);
         return $this;
     }
 
     public function get(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('GET', $path, $handler, $name);
+        $this->store->method('GET', $path, $handler, $name);
+        return $this;
     }
 
     public function delete(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('DELETE', $path, $handler, $name);
+        $this->store->method('DELETE', $path, $handler, $name);
+        return $this;
     }
 
     public function post(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('POST', $path, $handler, $name);
+        $this->store->method('POST', $path, $handler, $name);
+        return $this;
     }
 
     public function put(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('PUT', $path, $handler, $name);
+        $this->store->method('PUT', $path, $handler, $name);
+        return $this;
     }
 
     public function patch(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('PATCH', $path, $handler, $name);
+        $this->store->method('PATCH', $path, $handler, $name);
+        return $this;
     }
 
     /**
@@ -101,88 +91,26 @@ class Router implements RequestHandlerInterface
      */
     public function mount(Router $router, string $path = null): self
     {
-        foreach ($router->getLayers() as $layer) {
+        foreach ($router->store->getLayers() as $layer) {
             if (!$path || !$layer->path) {
-                $this->addLayer($layer);
+                $this->store->addLayer($layer);
                 continue;
             }
 
             $clone = clone $layer;
             $clone->path = $path.$layer->path;
-            $this->addLayer($clone);
+            $this->store->addLayer($clone);
         }
 
-        return $this;
-    }
-
-    public function url(string $name, array $placeholders = [], array $options = []): string
-    {
-        if (!$this->urlCreator) {
-            throw new RouterException('Need inject url creator via method `setUrlCreator`');
-        }
-
-        $layer = $this->findLayerByName($name);
-        return $this->urlCreator->create($layer, $placeholders, $options);
-    }
-
-    /**
-     * @return Layer[]
-     */
-    public function getLayers(): array
-    {
-        return $this->layers;
-    }
-
-    public function setPrefix(string $prefix): self
-    {
-        $this->prefix = $prefix;
         return $this;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $allowLayers = $this->resolver->findActiveLayers($this->layers, $request);
+        $allowLayers = $this->store->getLayersForRequest($request);
         $this->runner->setLayers($allowLayers);
 
-        $request = $this->withContext($request);
-        $this->events->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers]);
+        $this->events && $this->events->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers]);
         return $this->runner->handle($request);
-    }
-
-    protected function withContext(ServerRequestInterface $request): ServerRequestInterface
-    {
-        $context = new HttpContext;
-        $context->replaceState('router', $this);
-        $request = $request->withAttribute('context', $context);
-        $context->setRequest($request);
-        return $request;
-    }
-
-    protected function getFullPath(string $path = null): ?string
-    {
-        return null === $path ? null : $this->prefix.$path;
-    }
-
-    protected function method(string $method, string $path, callable $handler, string $name = null): self
-    {
-        $md = new CallableToMiddleware($handler);
-        $layer = $this->makeLayer($md, $path, $name)->setType('route')->setMethods([$method]);
-        return $this->addLayer($layer);
-    }
-
-    protected function makeLayer(MiddlewareInterface $md, string $path = null, string $name = null): Layer
-    {
-        return new Layer($this->getFullPath($path), $md, $name);
-    }
-
-    protected function findLayerByName(string $name): Layer
-    {
-        foreach ($this->getLayers() as $layer) {
-            if ($layer->path && $layer->name === $name) {
-                return $layer;
-            }
-        }
-
-        throw new RouterException("Layer with name {$name} not found");
     }
 }

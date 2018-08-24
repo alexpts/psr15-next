@@ -23,7 +23,7 @@ $events->on(Runner::EVENT_BEFORE_NEXT, function (ServerRequestInterface $request
     $context->replaceState('params', $runner->getCurrentLayer()->matches);
 });
 
-$app = new Router($layerResolver, $events);
+$app = new Router($layerResolver);
 
 $app
     ->middleware(new ResponseEmit($responseEmitter))

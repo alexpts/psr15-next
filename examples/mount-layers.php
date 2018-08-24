@@ -15,8 +15,8 @@ $responseEmitter = require 'include/ResponseEmitter.php';
 $layerResolver = new LayerResolver;
 $events = new Events;
 
-$app = new Router($layerResolver, $events);
-$api = new Router($layerResolver, $events);
+$app = new Router($layerResolver);
+$api = new Router($layerResolver);
 
 $api->get('/users/', function (ServerRequestInterface $request, $next) {
     return new JsonResponse(['message' => 'api users']);
@@ -28,7 +28,6 @@ $app
         return new JsonResponse(['message' => 'app']);
     })
     ->mount($api, '/api')
-    ->use($api, '/api')
     ->use(function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'otherwise']);
     });

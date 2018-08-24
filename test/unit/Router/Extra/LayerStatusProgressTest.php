@@ -5,6 +5,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\Events;
 use PTS\Events\EventsInterface;
+use PTS\NextRouter\Extra\HttpContext;
 use PTS\NextRouter\Extra\LayerStatusProgress;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
@@ -25,18 +26,18 @@ class LayerStatusProgressTest extends TestCase
         parent::setUp();
 
         $this->events = new Events;
-        $this->router = new Router(new LayerResolver, $this->events);
+        $this->router = new Router(new LayerResolver);
+        $this->router->setEvents($this->events);
     }
-
-
-//$context = new HttpContext;
-//$request = $request->withAttribute('context', $context);
-//$context->setRequest($request);
 
     public function testProgressStatus(): void
     {
         $request = new ServerRequest([], [], '/');
         $progressService = new LayerStatusProgress;
+
+        $context = new HttpContext;
+        $request = $request->withAttribute('context', $context);
+        $context->setRequest($request);
 
         $this->events->on($this->router::EVENT_BEFORE_HANDLE, [$progressService, 'withActiveLayers']);
         $this->events->on(Runner::EVENT_BEFORE_NEXT, [$progressService, 'setProgressLayer']);

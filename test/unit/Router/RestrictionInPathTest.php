@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PTS\Events\Events;
 use PTS\NextRouter\CallableToMiddleware;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Layer;
@@ -19,7 +18,7 @@ class RestrictionInPathTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router(new LayerResolver, new Events);
+        $this->router = new Router(new LayerResolver);
     }
 
     public function testSimple(): void
@@ -32,11 +31,10 @@ class RestrictionInPathTest extends TestCase
         }));
         $route->setRestrictions(['id' => '\d+']);
 
-        $this->router
-            ->addLayer($route)
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 'otherwise']);
-            });
+        $this->router->getStore()->addLayer($route);
+        $this->router->use(function ($request, $next) {
+            return new JsonResponse(['status' => 'otherwise']);
+        });
 
         /** @var JsonResponse $response */
         $response = $this->router->handle($request);

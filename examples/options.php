@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\Events\Events;
 use PTS\NextRouter\Extra\OptionsMiddleware;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
@@ -14,7 +13,7 @@ use Zend\Diactoros\ServerRequestFactory;
 require_once '../vendor/autoload.php';
 $responseEmitter = require 'include/ResponseEmitter.php';
 $resolver = new LayerResolver;
-$app = new Router($resolver, new Events);
+$app = new Router($resolver);
 
 $app
     ->middleware(new ResponseEmit($responseEmitter))

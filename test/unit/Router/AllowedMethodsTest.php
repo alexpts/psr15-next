@@ -21,7 +21,8 @@ class AllowedMethodsTest extends TestCase
         parent::setUp();
 
         $this->resolver = new LayerResolver;
-        $this->router = new Router($this->resolver, new Events);
+        $this->router = new Router($this->resolver);
+        $this->router->setEvents(new Events);
     }
 
     public function testSimple(): void

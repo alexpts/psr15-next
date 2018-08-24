@@ -2,7 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use PTS\Events\Events;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
 use Zend\Diactoros\Response\JsonResponse;
@@ -18,7 +17,7 @@ class UseTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router(new LayerResolver, new Events);
+        $this->router = new Router(new LayerResolver);
     }
 
     public function testMethod(): void

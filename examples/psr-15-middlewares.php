@@ -12,7 +12,7 @@ use Zend\Diactoros\ServerRequestFactory;
 
 require_once '../vendor/autoload.php';
 
-$app = new Router(new LayerResolver, new Events);
+$app = new Router(new LayerResolver);
 $responseEmitter = require 'include/ResponseEmitter.php';
 
 $app

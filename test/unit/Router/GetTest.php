@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PTS\Events\Events;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
 use Zend\Diactoros\Response\JsonResponse;
@@ -17,7 +16,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router(new LayerResolver, new Events);
+        $this->router = new Router(new LayerResolver);
     }
 
     public function testSimple(): void
@@ -75,8 +74,8 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/admins/dashboard');
 
-        $this->router = new Router(new LayerResolver, new Events);
-        $this->router->setPrefix('/admins');
+        $this->router = new Router;
+        $this->router->getStore()->setPrefix('/admins');
 
         /** @var JsonResponse $response */
         $response = $this->router
