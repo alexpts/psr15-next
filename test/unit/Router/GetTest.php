@@ -1,7 +1,6 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
@@ -16,19 +15,19 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router(new LayerResolver);
+        $this->router = new Router;
     }
 
     public function testSimple(): void
     {
         $request = new ServerRequest([], [], '/');
 
-        /** @var JsonResponse $response */
-        $response = $this->router
+        $this->router->getStore()
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
-            })
-            ->handle($request);
+            });
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['status' => 200], $response->getPayload());
     }
@@ -37,15 +36,16 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/main');
 
-        /** @var JsonResponse $response */
-        $response = $this->router
+        $this->router->getStore()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
             ->get('/main', function ($request, $next) {
                 return new JsonResponse(['status' => 'main']);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['status' => 'main'], $response->getPayload());
     }
@@ -54,8 +54,7 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/otherwise');
 
-        /** @var JsonResponse $response */
-        $response = $this->router
+        $this->router->getStore()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -64,8 +63,10 @@ class GetTest extends TestCase
             })
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 'otherwise']);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['status' => 'otherwise'], $response->getPayload());
     }
@@ -73,19 +74,19 @@ class GetTest extends TestCase
     public function testWithPrefix(): void
     {
         $request = new ServerRequest([], [], '/admins/dashboard');
+        $router = new Router;
 
-        $this->router = new Router;
-        $this->router->getStore()->setPrefix('/admins');
-
-        /** @var JsonResponse $response */
-        $response = $this->router
+        $router->getStore()
+            ->setPrefix('/admins')
             ->get('/admins/dashboard', function ($request, $next) { // /admins/admins/dashboard
                 throw new \Exception('must skip');
             })
             ->get('/dashboard', function ($request, $next) {
                 return new JsonResponse(['status' => 'dashboard']);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $router->handle($request);
 
         $this->assertSame(['status' => 'dashboard'], $response->getPayload());
     }

@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\Events\Events;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
@@ -15,7 +14,7 @@ require_once '../vendor/autoload.php';
 $app = new Router(new LayerResolver);
 $responseEmitter = require 'include/ResponseEmitter.php';
 
-$app
+$app->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
     ->middleware(new ErrorToJsonResponse(true), '/api/.*') // middelware active only /api/* path
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {

@@ -23,13 +23,14 @@ class UseTest extends TestCase
     public function testMethod(): void
     {
         $request = new ServerRequest();
-        /** @var JsonResponse $response */
 
-        $response = $this->router
+        $this->router->getStore()
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['status' => 200], $response->getPayload());
     }
@@ -37,16 +38,17 @@ class UseTest extends TestCase
     public function testChainMiddlewares(): void
     {
         $request = new ServerRequest();
-        /** @var JsonResponse $response */
 
-        $response = $this->router
+        $this->router->getStore()
             ->use(function ($request, RequestHandlerInterface $next) {
                 return $next->handle($request);
             })
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 202]);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['status' => 202], $response->getPayload());
     }
@@ -54,16 +56,17 @@ class UseTest extends TestCase
     public function testPathMiddlewares(): void
     {
         $request = new ServerRequest();
-        /** @var JsonResponse $response */
 
-        $response = $this->router
+        $this->router->getStore()
             ->use(function ($request, $next) {
                 return new JsonResponse(['name' => 'A']);
             }, '/blog')
             ->use(function ($request, $next) {
                 return new JsonResponse(['name' => 'B']);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['name' => 'B'], $response->getPayload());
     }

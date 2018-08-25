@@ -15,7 +15,7 @@ $responseEmitter = require 'include/ResponseEmitter.php';
 $resolver = new LayerResolver;
 $app = new Router($resolver);
 
-$app
+$app->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => "fetch('/api/users/', {method: 'OPTIONS'}).then(response => console.log(response.headers.get(\"Access-Control-Allow-Methods\")))"]);

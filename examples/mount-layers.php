@@ -15,25 +15,27 @@ $responseEmitter = require 'include/ResponseEmitter.php';
 $layerResolver = new LayerResolver;
 $events = new Events;
 
-$app = new Router($layerResolver);
-$api = new Router($layerResolver);
+$apiV1 = new Router($layerResolver);
+$apiV2 = new Router($layerResolver);
 
-$api->get('/users/', function (ServerRequestInterface $request, $next) {
+$apiV2->getStore()->get('/users/', function (ServerRequestInterface $request, $next) {
     return new JsonResponse(['message' => 'api users']);
 });
 
-$app
+$apiV1->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
     ->get('/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'app']);
-    })
-    ->mount($api, '/api')
-    ->use(function (ServerRequestInterface $request, $next) {
-        return new JsonResponse(['message' => 'otherwise']);
     });
+
+$apiV1->mount($apiV2, '/api');
+
+$apiV1->getStore()->use(function (ServerRequestInterface $request, $next) {
+    return new JsonResponse(['message' => 'otherwise']);
+});
 
 
 $request = ServerRequestFactory::fromGlobals();
 //$request = new ServerRequest([], [], '/api/users/');
-$response = $app->handle($request);
+$response = $apiV1->handle($request);
 

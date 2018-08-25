@@ -25,7 +25,7 @@ $events->on(Runner::EVENT_BEFORE_NEXT, function (ServerRequestInterface $request
 
 $app = new Router($layerResolver);
 
-$app
+$app->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
     ->get('/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'app']);

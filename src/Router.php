@@ -5,7 +5,6 @@ namespace PTS\NextRouter;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\EventsInterface;
 
@@ -37,48 +36,6 @@ class Router implements RequestHandlerInterface
     public function getStore(): StoreLayers
     {
         return $this->store;
-    }
-
-    public function use(callable $handler, string $path = null, string $name = null): self
-    {
-        $this->store->middleware(new CallableToMiddleware($handler), $path, $name);
-        return $this;
-    }
-
-    public function middleware(MiddlewareInterface $md, string $path = null, string $name = null): self
-    {
-        $this->store->middleware($md, $path, $name);
-        return $this;
-    }
-
-    public function get(string $path, callable $handler, string $name = null): self
-    {
-        $this->store->method('GET', $path, $handler, $name);
-        return $this;
-    }
-
-    public function delete(string $path, callable $handler, string $name = null): self
-    {
-        $this->store->method('DELETE', $path, $handler, $name);
-        return $this;
-    }
-
-    public function post(string $path, callable $handler, string $name = null): self
-    {
-        $this->store->method('POST', $path, $handler, $name);
-        return $this;
-    }
-
-    public function put(string $path, callable $handler, string $name = null): self
-    {
-        $this->store->method('PUT', $path, $handler, $name);
-        return $this;
-    }
-
-    public function patch(string $path, callable $handler, string $name = null): self
-    {
-        $this->store->method('PATCH', $path, $handler, $name);
-        return $this;
     }
 
     /**

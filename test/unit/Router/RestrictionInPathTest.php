@@ -2,8 +2,8 @@
 
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\CallableToMiddleware;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Layer;
+use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
@@ -31,10 +31,11 @@ class RestrictionInPathTest extends TestCase
         }));
         $route->setRestrictions(['id' => '\d+']);
 
-        $this->router->getStore()->addLayer($route);
-        $this->router->use(function ($request, $next) {
-            return new JsonResponse(['status' => 'otherwise']);
-        });
+        $this->router->getStore()
+            ->addLayer($route)
+            ->use(function ($request, $next) {
+                return new JsonResponse(['status' => 'otherwise']);
+            });
 
         /** @var JsonResponse $response */
         $response = $this->router->handle($request);

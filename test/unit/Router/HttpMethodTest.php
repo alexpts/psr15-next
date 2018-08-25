@@ -23,8 +23,7 @@ class HttpMethodTest extends TestCase
     {
         $request = new ServerRequest([], [], '/');
 
-        /** @var JsonResponse $response */
-        $response = $this->router
+        $this->router->getStore()
             // expected skip by http method
             ->post('/', function ($request, $next) {
                 return new JsonResponse(['method' => 'post']);
@@ -34,8 +33,10 @@ class HttpMethodTest extends TestCase
             })
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['method' => 'get']);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertSame(['method' => 'get'], $response->getPayload());
     }

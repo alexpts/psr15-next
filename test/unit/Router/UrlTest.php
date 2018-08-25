@@ -24,7 +24,7 @@ class UrlTest extends TestCase
 
     public function testGood(): void
     {
-        $this->router
+        $this->router->getStore()
             ->get('/users/{id}/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             }, 'user');

@@ -3,7 +3,6 @@
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Extra\UrlCreator;
 use PTS\NextRouter\Router;
-use PTS\NextRouter\RouterException;
 use Zend\Diactoros\Response\JsonResponse;
 
 class CreateUrlTest extends TestCase
@@ -22,12 +21,9 @@ class CreateUrlTest extends TestCase
         $this->urlCreator = new UrlCreator($this->router);
     }
 
-    /**
-     * @throws RouterException
-     */
     public function testSimple(): void
     {
-        $this->router
+        $this->router->getStore()
             ->get('/users/{id}/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             }, 'user');

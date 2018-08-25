@@ -43,8 +43,7 @@ class LayerStatusProgressTest extends TestCase
         $this->events->on(Runner::EVENT_BEFORE_NEXT, [$progressService, 'setProgressLayer']);
         $this->events->on(Runner::EVENT_AFTER_NEXT, [$progressService, 'setCompleteLayer']);
 
-        /** @var JsonResponse $response */
-        $response = $this->router
+        $this->router->getStore()
             ->use(function (ServerRequestInterface $request, RequestHandlerInterface $next) {
                 /** @var JsonResponse $response */
                 $response = $next->handle($request);
@@ -59,8 +58,10 @@ class LayerStatusProgressTest extends TestCase
             }, '/not-active-layer', 'bad-md')
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 'otherwise']);
-            })
-            ->handle($request);
+            });
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
 
         $this->assertCount(3, $response->getPayload()['activeLayers']);
         $this->assertSame([

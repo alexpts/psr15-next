@@ -24,7 +24,7 @@ class MountTest extends TestCase
         $request = new ServerRequest([], [], '/');
         $router2 = clone $this->router;
 
-        $router2
+        $router2->getStore()
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 401]);
             }, '/admin/.*')

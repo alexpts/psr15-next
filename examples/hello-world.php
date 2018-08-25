@@ -14,7 +14,7 @@ require_once '../vendor/autoload.php';
 $app = new Router(new LayerResolver);
 $responseEmitter = require 'include/ResponseEmitter.php';
 
-$app
+$app->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
     ->get('/users', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'Hello world'], 200);

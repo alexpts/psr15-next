@@ -13,7 +13,7 @@ require_once '../vendor/autoload.php';
 $app = new Router(new LayerResolver);
 $responseEmitter = require 'include/ResponseEmitter.php';
 
-$app
+$app->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
     ->get('/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'GET /']);

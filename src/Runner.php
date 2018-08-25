@@ -5,8 +5,10 @@ namespace PTS\NextRouter;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\EventsInterface;
+use PTS\NextRouter\Extra\PipeStack;
 
 class Runner implements RequestHandlerInterface
 {
@@ -36,15 +38,25 @@ class Runner implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $layer = $this->layers[$this->index];
+        $middleware = $this->getNextMiddleware();
         $this->beforeHandle($request);
 
         $this->index++;
-        $response = $layer->md->process($request, $this);
+        $response = $middleware->process($request, $this);
         $this->index--;
 
         $this->afterHandle($request, $response);
         return $response;
+    }
+
+    protected function getNextMiddleware(): MiddlewareInterface
+    {
+        $middleware = $this->layers[$this->index]->md;
+        if ($middleware instanceof PipeStack) {
+            $middleware->setNext($this);
+        }
+
+        return $middleware;
     }
 
     protected function beforeHandle(ServerRequestInterface $request): void

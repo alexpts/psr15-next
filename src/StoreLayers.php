@@ -5,6 +5,7 @@ namespace PTS\NextRouter;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use PTS\NextRouter\Extra\PipeStack;
 
 class StoreLayers
 {
@@ -35,6 +36,12 @@ class StoreLayers
         $this->layers[] = $layer;
 
         $this->autoincrement++;
+        return $this;
+    }
+
+    public function use(callable $handler, string $path = null, string $name = null): self
+    {
+        $this->middleware(new CallableToMiddleware($handler), $path, $name);
         return $this;
     }
 
@@ -82,13 +89,57 @@ class StoreLayers
         return $this->addLayer($layer);
     }
 
+    public function get(string $path, callable $handler, string $name = null): self
+    {
+        return $this->method('GET', $path, $handler, $name);
+    }
+
+    public function delete(string $path, callable $handler, string $name = null): self
+    {
+        return $this->method('DELETE', $path, $handler, $name);
+    }
+
+    public function post(string $path, callable $handler, string $name = null): self
+    {
+        return $this->method('POST', $path, $handler, $name);
+    }
+
+    public function put(string $path, callable $handler, string $name = null): self
+    {
+        return $this->method('PUT', $path, $handler, $name);
+    }
+
+    public function patch(string $path, callable $handler, string $name = null): self
+    {
+        return $this->method('PATCH', $path, $handler, $name);
+    }
+
+    public function makeLayer(MiddlewareInterface $md, string $path = null, string $name = null): Layer
+    {
+        return new Layer($this->getFullPath($path), $md, $name);
+    }
+
+    /**
+     * @param string $path
+     * @param callable[] $handlers
+     * @param string $method
+     * @param string|null $name
+     *
+     * @return $this
+     */
+    public function pipeMethod(string $method, string $path, array $handlers, string $name = null): self
+    {
+        $pipe = new PipeStack;
+        foreach ($handlers as $handler) {
+            $pipe->add(new CallableToMiddleware($handler));
+        }
+
+        $layer = $this->makeLayer($pipe, $path, $name)->setType('route')->setMethods([$method]);
+        return $this->addLayer($layer);
+    }
+
     protected function getFullPath(string $path = null): ?string
     {
         return null === $path ? null : $this->prefix.$path;
-    }
-
-    protected function makeLayer(MiddlewareInterface $md, string $path = null, string $name = null): Layer
-    {
-        return new Layer($this->getFullPath($path), $md, $name);
     }
 }
