@@ -12,10 +12,10 @@ Router for PSR-15 middlewares. Base for micro framework.
 [See examples](https://github.com/alexpts/psr15-next/tree/master/examples)
 
 
-* Named routes with URL generation.
-* Responds to `OPTIONS` requests with allowed methods.
-* Multiple route middleware.
-* Multiple routers.
-* Nestable routers.
+* Named routes with URL generation
+* Responds to `OPTIONS` requests with allowed methods
+* Multiple route middleware
+* Multiple routers
+* Nestable routers
 * PSR-15 middlewares
 * PSR-7 request/response
