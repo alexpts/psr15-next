@@ -47,7 +47,7 @@ class StoreLayers
 
     public function middleware(MiddlewareInterface $md, string $path = null, string $name = null): self
     {
-        $layer = $this->makeLayer($md, $path, $name)->setType('middleware');
+        $layer = $this->makeLayer($md, $path, $name);
         $this->addLayer($layer);
 
         return $this;
@@ -85,7 +85,7 @@ class StoreLayers
     public function method(string $method, string $path, callable $handler, string $name = null): self
     {
         $md = new CallableToMiddleware($handler);
-        $layer = $this->makeLayer($md, $path, $name)->setType('route')->setMethods([$method]);
+        $layer = $this->makeLayer($md, $path, $name)->setType(Layer::TYPE_ROUTE)->setMethods([$method]);
         return $this->addLayer($layer);
     }
 
@@ -134,7 +134,7 @@ class StoreLayers
             $pipe->add(new CallableToMiddleware($handler));
         }
 
-        $layer = $this->makeLayer($pipe, $path, $name)->setType('route')->setMethods([$method]);
+        $layer = $this->makeLayer($pipe, $path, $name)->setType(Layer::TYPE_ROUTE)->setMethods([$method]);
         return $this->addLayer($layer);
     }
 

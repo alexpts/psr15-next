@@ -7,6 +7,7 @@ use PTS\Events\Events;
 use PTS\Events\EventsInterface;
 use PTS\NextRouter\Extra\HttpContext;
 use PTS\NextRouter\Extra\LayerStatusProgress;
+use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Router;
 use PTS\NextRouter\Runner;
@@ -67,19 +68,19 @@ class LayerStatusProgressTest extends TestCase
         $this->assertSame([
             0 => [
                 'name' => 'layer-0',
-                'type' => 'middleware',
+                'type' => Layer::TYPE_MIDDLEWARE,
                 'regexp' => null,
                 'status' => 'progress'
             ],
             1 =>[
                 'name' => 'main-page',
-                'type' => 'route',
+                'type' => Layer::TYPE_ROUTE,
                 'regexp' => '/',
                 'status' => 'complete'
             ],
             2 => [
                 'name' => 'layer-3',
-                'type' => 'middleware',
+                'type' => Layer::TYPE_MIDDLEWARE,
                 'regexp' => null,
                 'status' => 'pending'
             ]

@@ -7,6 +7,10 @@ use Psr\Http\Server\MiddlewareInterface;
 
 class Layer
 {
+
+    public const TYPE_MIDDLEWARE = 'middleware';
+    public const TYPE_ROUTE = 'route';
+
     /** @var string|null */
     public $path;
     /** @var MiddlewareInterface */
@@ -18,8 +22,8 @@ class Layer
     public $matches = [];
     /** @var array */
     public $restrictions = [];
-    /** @var null|string - middleware or route */
-    public $type;
+    /** @var string */
+    public $type = self::TYPE_MIDDLEWARE;
     /** @var string|null */
     public $name;
     /** @var string - regexp от path */
