@@ -15,6 +15,11 @@ class Layer
     public $path;
     /** @var MiddlewareInterface */
     public $md;
+    /** @var int */
+    public $priority = 50;
+    public $type = self::TYPE_MIDDLEWARE;
+    /** @var string|null */
+    public $name;
 
     /** @var array */
     public $methods = [];
@@ -23,9 +28,7 @@ class Layer
     /** @var array */
     public $restrictions = [];
     /** @var string */
-    public $type = self::TYPE_MIDDLEWARE;
-    /** @var string|null */
-    public $name;
+
     /** @var string - regexp от path */
     public $regexp;
 
@@ -34,6 +37,12 @@ class Layer
         $this->path = $path;
         $this->name = $name;
         $this->md = $md;
+    }
+
+    public function setPriority(int $priority = 50): self
+    {
+        $this->priority = $priority;
+        return $this;
     }
 
     public function setMethods(array $methods = []): self

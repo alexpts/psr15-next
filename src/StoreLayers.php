@@ -119,6 +119,25 @@ class StoreLayers
         return new Layer($this->getFullPath($path), $md, $name);
     }
 
+    public function sortByPriority(): self
+    {
+        usort($this->layers, function (Layer $a, Layer $b) {
+            if ($a->priority === $b->priority) {
+                return 0;
+            }
+
+            return $a->priority < $b->priority ? -1 : 1;
+        });
+
+        return $this;
+    }
+
+    public function getLastLayer(): ?Layer
+    {
+        $count = \count($this->layers);
+        return $count ? $this->layers[$count -1] : null;
+    }
+
     /**
      * @param string $path
      * @param callable[] $handlers
