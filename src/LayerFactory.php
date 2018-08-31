@@ -18,7 +18,7 @@ class LayerFactory
         $this->prefix = $prefix;
     }
 
-    public function callable(callable $handler, array $options): Layer
+    public function callable(callable $handler, array $options = []): Layer
     {
         return $this->middleware(new CallableToMiddleware($handler), $options);
     }
