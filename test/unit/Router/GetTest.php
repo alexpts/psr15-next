@@ -32,6 +32,21 @@ class GetTest extends TestCase
         $this->assertSame(['status' => 200], $response->getPayload());
     }
 
+    public function testInvoke(): void
+    {
+        $request = new ServerRequest([], [], '/');
+        $router = $this->router;
+
+        $router->getStore()
+            ->get('/', function ($request, $next) {
+                return new JsonResponse(['status' => 200]);
+            });
+        /** @var JsonResponse $response */
+        $response = $router($request);
+
+        $this->assertSame(['status' => 200], $response->getPayload());
+    }
+
     public function testSimple2(): void
     {
         $request = new ServerRequest([], [], '/main');

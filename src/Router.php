@@ -26,6 +26,11 @@ class Router implements RequestHandlerInterface
         $this->runner = new Runner;
     }
 
+    public function __invoke(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->handle($request);
+    }
+
     public function setEvents(EventsInterface $events): self
     {
         $this->events = $events;
