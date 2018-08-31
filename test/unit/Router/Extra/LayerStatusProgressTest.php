@@ -56,7 +56,7 @@ class LayerStatusProgressTest extends TestCase
             }, 'main-page')
             ->use(function (ServerRequestInterface $request, RequestHandlerInterface $next) {
                 return $next->handle($request);
-            }, '/not-active-layer', 'bad-md')
+            }, ['path' => '/not-active-layer', 'name' => 'bad-md'])
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 'otherwise']);
             });

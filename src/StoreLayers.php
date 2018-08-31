@@ -5,7 +5,6 @@ namespace PTS\NextRouter;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use PTS\NextRouter\Extra\PipeStack;
 
 class StoreLayers
 {
@@ -15,17 +14,23 @@ class StoreLayers
     protected $layers = [];
     /** @var int */
     protected $autoincrement = 0;
-    /** @var string */
-    protected $prefix = '';
+    /** @var LayerFactory */
+    protected $layerFactory;
 
     public function __construct(LayerResolver $resolver)
     {
         $this->resolver = $resolver;
+        $this->layerFactory = new LayerFactory;
+    }
+
+    public function getResolver(): LayerResolver
+    {
+        return $this->resolver;
     }
 
     public function setPrefix(string $prefix): self
     {
-        $this->prefix = $prefix;
+        $this->layerFactory->setPrefix($prefix);
         return $this;
     }
 
@@ -39,15 +44,14 @@ class StoreLayers
         return $this;
     }
 
-    public function use(callable $handler, string $path = null, string $name = null): self
+    public function use(callable $handler, array $options = []): self
     {
-        $this->middleware(new CallableToMiddleware($handler), $path, $name);
-        return $this;
+        return $this->middleware(new CallableToMiddleware($handler), $options);
     }
 
-    public function middleware(MiddlewareInterface $md, string $path = null, string $name = null): self
+    public function middleware(MiddlewareInterface $md, array $options = []): self
     {
-        $layer = $this->makeLayer($md, $path, $name);
+        $layer = $this->layerFactory->middleware($md, $options);
         $this->addLayer($layer);
 
         return $this;
@@ -82,41 +86,40 @@ class StoreLayers
         return null;
     }
 
-    public function method(string $method, string $path, callable $handler, string $name = null): self
+    public function method(string $method, string $path, callable $handler, array $options = []): self
     {
-        $md = new CallableToMiddleware($handler);
-        $layer = $this->makeLayer($md, $path, $name)->setType(Layer::TYPE_ROUTE)->setMethods([$method]);
+        $options = array_merge(
+            ['type' => Layer::TYPE_ROUTE],
+            $options,
+            ['path' => $path, 'method' => (array)$method]
+        );
+        $layer = $this->layerFactory->middleware(new CallableToMiddleware($handler), $options);
         return $this->addLayer($layer);
     }
 
     public function get(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('GET', $path, $handler, $name);
+        return $this->method('GET', $path, $handler, ['name' => $name]);
     }
 
     public function delete(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('DELETE', $path, $handler, $name);
+        return $this->method('DELETE', $path, $handler, ['name' => $name]);
     }
 
     public function post(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('POST', $path, $handler, $name);
+        return $this->method('POST', $path, $handler, ['name' => $name]);
     }
 
     public function put(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('PUT', $path, $handler, $name);
+        return $this->method('PUT', $path, $handler, ['name' => $name]);
     }
 
     public function patch(string $path, callable $handler, string $name = null): self
     {
-        return $this->method('PATCH', $path, $handler, $name);
-    }
-
-    public function makeLayer(MiddlewareInterface $md, string $path = null, string $name = null): Layer
-    {
-        return new Layer($this->getFullPath($path), $md, $name);
+        return $this->method('PATCH', $path, $handler, ['name' => $name]);
     }
 
     public function sortByPriority(): self
@@ -139,26 +142,24 @@ class StoreLayers
     }
 
     /**
-     * @param string $path
+     * @param string|null $path
      * @param callable[] $handlers
-     * @param string $method
-     * @param string|null $name
+     * @param array $options
      *
      * @return $this
      */
-    public function pipeMethod(string $method, string $path, array $handlers, string $name = null): self
+    public function pipe(array $handlers, array $options = [], string $path = null): self
     {
-        $pipe = new PipeStack;
-        foreach ($handlers as $handler) {
-            $pipe->add(new CallableToMiddleware($handler));
-        }
+        $layer = $this->layerFactory->pipe($handlers, array_merge([
+            'path' => $path,
+            'type' => Layer::TYPE_ROUTE,
+        ], $options));
 
-        $layer = $this->makeLayer($pipe, $path, $name)->setType(Layer::TYPE_ROUTE)->setMethods([$method]);
         return $this->addLayer($layer);
     }
 
-    protected function getFullPath(string $path = null): ?string
+    public function getLayerFactory(): LayerFactory
     {
-        return null === $path ? null : $this->prefix.$path;
+        return $this->layerFactory;
     }
 }

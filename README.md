@@ -19,3 +19,5 @@ Router for PSR-15 middlewares. Base for micro framework.
 * Nestable routers
 * PSR-15 middlewares
 * PSR-7 request/response
+* Flexible priority (low level)
+* Dynamic endpoint (low level)

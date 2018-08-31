@@ -27,7 +27,7 @@ class PipeMethodTest extends TestCase
             ->get('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 'user']);
             })
-            ->pipeMethod('GET', '/profile', [
+            ->pipe([
                 function($request, RequestHandlerInterface $next) {
                     /** @var JsonResponse $response */
                     $response = $next->handle($request);
@@ -39,9 +39,9 @@ class PipeMethodTest extends TestCase
                     $body = array_merge($response->getPayload(), ['pipe2' => true]);
                     return new JsonResponse($body);
                 },
-            ])->use(function(){
+            ], ['method' => ['GET'], 'path' => '/profile'])->use(function(){
                 return new JsonResponse(['status' => 404]);
-            }, null, 'otherwise');
+            }, ['name' => 'otherwise']);
 
         /** @var JsonResponse $response */
         $response = $this->router->handle($request);
@@ -57,7 +57,7 @@ class PipeMethodTest extends TestCase
             ->get('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 'user']);
             })
-            ->pipeMethod('GET', '/profile', [
+            ->pipe([
                 function($request, RequestHandlerInterface $next) {
                     /** @var JsonResponse $response */
                     $response = $next->handle($request);
@@ -67,7 +67,7 @@ class PipeMethodTest extends TestCase
                 function($request, $next) {
                     return new JsonResponse(['pipe2' => true]);
                 },
-            ]);
+            ], ['method' => ['GET'], 'path' => '/profile']);
 
         /** @var JsonResponse $response */
         $response = $this->router->handle($request);

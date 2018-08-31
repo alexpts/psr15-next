@@ -12,8 +12,7 @@ use Zend\Diactoros\ServerRequestFactory;
 
 require_once '../vendor/autoload.php';
 $responseEmitter = require 'include/ResponseEmitter.php';
-$resolver = new LayerResolver;
-$app = new Router($resolver);
+$app = new Router;
 
 $app->getStore()
     ->middleware(new ResponseEmit($responseEmitter))
@@ -23,7 +22,7 @@ $app->getStore()
     ->post('/api/users/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'post /api/users/']);
     })
-    ->middleware(new OptionsMiddleware($app, $resolver))
+    ->middleware(new OptionsMiddleware($app))
     ->use(function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'otherwise']);
     });

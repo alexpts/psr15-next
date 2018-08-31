@@ -20,8 +20,7 @@ class AllowedMethodsTest extends TestCase
     {
         parent::setUp();
 
-        $this->resolver = new LayerResolver;
-        $this->router = new Router($this->resolver);
+        $this->router = new Router;
         $this->router->setEvents(new Events);
     }
 
@@ -36,7 +35,7 @@ class AllowedMethodsTest extends TestCase
             ->delete('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             })
-            ->middleware(new OptionsMiddleware($this->router, new LayerResolver));
+            ->middleware(new OptionsMiddleware($this->router));
 
         $response = $this->router->handle($request);
 
@@ -55,7 +54,7 @@ class AllowedMethodsTest extends TestCase
             ->put('/not-user/{id}/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             })
-            ->middleware(new OptionsMiddleware($this->router, $this->resolver))
+            ->middleware(new OptionsMiddleware($this->router))
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 404]);
             });

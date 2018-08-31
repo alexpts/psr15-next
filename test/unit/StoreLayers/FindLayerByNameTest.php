@@ -24,10 +24,10 @@ class FindLayerByNameTest extends TestCase
         $this->store
             ->method('GET', '/', function ($request, $next) {
                 return new JsonResponse(['status' => 'a']);
-            }, 'a')
+            }, ['name' => 'a'])
             ->method('GET', '/', function ($request, $next) {
                 return new JsonResponse(['status' => 'b']);
-            }, 'b');
+            }, ['name' => 'b']);
 
         $this->assertInstanceOf(Layer::class, $this->store->findLayerByName('a'));
         $this->assertInstanceOf(Layer::class, $this->store->findLayerByName('b'));

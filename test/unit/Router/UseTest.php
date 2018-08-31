@@ -60,7 +60,7 @@ class UseTest extends TestCase
         $this->router->getStore()
             ->use(function ($request, $next) {
                 return new JsonResponse(['name' => 'A']);
-            }, '/blog')
+            }, ['path' => '/blog'])
             ->use(function ($request, $next) {
                 return new JsonResponse(['name' => 'B']);
             });

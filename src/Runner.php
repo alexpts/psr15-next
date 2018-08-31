@@ -39,6 +39,7 @@ class Runner implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $middleware = $this->getNextMiddleware();
+        $request = $this->withParams($request);
         $this->beforeHandle($request);
 
         $this->index++;
@@ -47,6 +48,17 @@ class Runner implements RequestHandlerInterface
 
         $this->afterHandle($request, $response);
         return $response;
+    }
+
+    protected function withParams(ServerRequestInterface $request): ServerRequestInterface
+    {
+        $layer = $this->getCurrentLayer();
+        if ($layer->matches) {
+            $old = $request->getAttribute('params', []);
+            $request = $request->withAttribute('params', array_merge($old, $layer->matches));
+        }
+
+        return $request->withAttribute('router.current.layer', $layer);
     }
 
     protected function getNextMiddleware(): MiddlewareInterface

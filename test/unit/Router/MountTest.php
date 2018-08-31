@@ -27,7 +27,7 @@ class MountTest extends TestCase
         $router2->getStore()
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 401]);
-            }, '/admin/.*')
+            }, ['path' => '/admin/.*'])
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });

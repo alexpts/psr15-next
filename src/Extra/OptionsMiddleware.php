@@ -19,10 +19,10 @@ class OptionsMiddleware implements MiddlewareInterface
     /** @var LayerResolver */
     protected $resolver;
 
-    public function __construct(Router $router, LayerResolver $resolver)
+    public function __construct(Router $router)
     {
         $this->layers = $router->getStore()->getLayers();
-        $this->resolver = $resolver;
+        $this->resolver = $router->getStore()->getResolver();
     }
 
     /**

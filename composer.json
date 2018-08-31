@@ -38,5 +38,10 @@
         "psr-4": {
             "PTS\\NextRouter\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PTS\\NextRouter\\Controller\\": "test/controller"
+        }
     }
 }
