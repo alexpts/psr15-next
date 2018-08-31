@@ -45,13 +45,13 @@ class LayerFactory
     public function endPoint(array $params, array $options = []): Layer
     {
         $endpoint = new EndPoint($params);
-        return $this->middleware($endpoint, $options);
+        return $this->middleware($endpoint, array_merge(['type' => Layer::TYPE_ROUTE], $options));
     }
 
     public function dynamicEndPoint(array $params, array $options = []): Layer
     {
         $endpoint = new DynamicPoint($params);
-        return $this->middleware($endpoint, $options);
+        return $this->middleware($endpoint, array_merge(['type' => Layer::TYPE_ROUTE], $options));
     }
 
     /**
