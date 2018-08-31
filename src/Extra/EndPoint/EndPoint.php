@@ -17,6 +17,11 @@ class EndPoint implements MiddlewareInterface
     /** @var bool */
     protected $nextOnError = true;
 
+    /** @var bool - reuse a controller for many requests */
+    protected $reuse = false;
+    /** @var MiddlewareInterface[] - cache for reuse controllers */
+    protected $cache = [];
+
     public function __construct(array $params = [])
     {
         foreach ($params as $name => $param) {
@@ -61,14 +66,39 @@ class EndPoint implements MiddlewareInterface
      */
     protected function getPoint(ServerRequestInterface $request): callable
     {
-        $controller = $this->getControllerClass($request);
-        $this->checkController($controller);
-
-        $controller = new $controller;
+        $controller = $this->getController($request);
         $action = $this->getAction($request) ?? 'index';
         $this->checkAction($controller, $action);
 
         return [$controller, $action];
+    }
+
+    protected function getController(ServerRequestInterface $request): object
+    {
+        $class = $this->getControllerClass($request);
+
+        $controller = $this->getFromCache($class);
+        if (null !== $controller) {
+            return $controller;
+        }
+
+        $this->checkController($class);
+        $controller = new $class;
+
+        $this->setToCache($class, $controller);
+        return $controller;
+    }
+
+    protected function getFromCache(string $class): ?object
+    {
+        return $this->cache[$class] ?? null;
+    }
+
+    protected function setToCache(string $class, $controller): void
+    {
+        if ($this->reuse) {
+            $this->cache[$class] = $controller;
+        }
     }
 
     protected function getControllerClass(ServerRequestInterface $request): string

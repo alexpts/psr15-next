@@ -34,6 +34,25 @@ class EndPointTest extends TestCase
         $this->assertSame(['action' => 'main'], $response->getPayload());
     }
 
+    public function testEndPointReuse(): void
+    {
+        $request = new ServerRequest([], [], '/');
+        $store = $this->router->getStore();
+
+        $endPoint = ['controller' => UserController::class, 'reuse' => true];
+        $layer = $store->getLayerFactory()->endPoint($endPoint, [
+            'path' => '/'
+        ]);
+        $store->addLayer($layer);
+
+        /** @var JsonResponse $response */
+        $response = $this->router->handle($request);
+        /** @var JsonResponse $response2 */
+        $response2 = $this->router->handle($request);
+        $this->assertSame(['action' => 'main'], $response->getPayload());
+        $this->assertSame(['action' => 'main'], $response2->getPayload());
+    }
+
     public function testBacController(): void
     {
         $request = new ServerRequest([], [], '/');
