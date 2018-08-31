@@ -17,12 +17,12 @@ class DynamicPoint extends EndPoint
             throw new \BadMethodCallException('Not found controller name for dynamic controller point');
         }
 
-        return $this->prefix . $this->normalizeClassFromUrl($matches['_controller']);
+        return $this->prefix.$this->normalizeClassFromUrl($matches['_controller']);
     }
 
     protected function normalizeClassFromUrl(string $class): string
     {
-        return array_reduce(explode('-', $class), function ($prev, $item) {
+        return array_reduce(explode('-', $class), function($prev, $item) {
             return $prev . ucfirst($item);
         });
     }
