@@ -41,10 +41,15 @@ class Runner implements RequestHandlerInterface
         $middleware = $this->getNextMiddleware();
         $request = $this->withParams($request);
         $this->beforeHandle($request);
-
         $this->index++;
-        $response = $middleware->process($request, $this);
-        $this->index--;
+
+        try {
+            $response = $middleware->process($request, $this);
+        } catch (\Throwable $throwable) {
+            throw $throwable;
+        } finally {
+            $this->index--;
+        }
 
         $this->afterHandle($request, $response);
         return $response;
