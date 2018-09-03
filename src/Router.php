@@ -54,13 +54,13 @@ class Router implements RequestHandlerInterface
     public function mount(Router $router, string $path = null): self
     {
         foreach ($router->store->getLayers() as $layer) {
-            if (!$path || !$layer->path) {
+            if (!$path) {
                 $this->store->addLayer($layer);
                 continue;
             }
 
             $clone = clone $layer;
-            $clone->path = $path.$layer->path;
+            $clone->path = !$layer->path ? $path.'/.*' : $path.$layer->path;
             $this->store->addLayer($clone);
         }
 
