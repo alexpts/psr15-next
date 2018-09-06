@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\LayerResolver;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
-use PTS\PSR15\Middlewares\ResponseEmit;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 require_once '../vendor/autoload.php';
 
-$app = new Router(new LayerResolver);
-$responseEmitter = require 'include/ResponseEmitter.php';
+$app = new Next(new LayerResolver);
 
-$app->getStore()
-    ->middleware(new ResponseEmit($responseEmitter))
+$app->getStoreLayers()
     ->middleware(new ErrorToJsonResponse(true), '/api/.*') // middelware active only /api/* path
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {
         throw new \Exception('Exception text - will convert to json response');
@@ -28,6 +26,6 @@ $app->getStore()
     });
 
 $request = ServerRequestFactory::fromGlobals();
-//$request = new ServerRequest([], [], '/api/users/');
 $response = $app->handle($request);
+(new SapiEmitter)->emit($response);
 

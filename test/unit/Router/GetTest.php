@@ -1,28 +1,28 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class GetTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Router;
+        $this->router = new Next;
     }
 
     public function testSimple(): void
     {
         $request = new ServerRequest([], [], '/');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });
@@ -37,7 +37,7 @@ class GetTest extends TestCase
         $request = new ServerRequest([], [], '/');
         $router = $this->router;
 
-        $router->getStore()
+        $router->getStoreLayers()
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });
@@ -51,7 +51,7 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/main');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -69,7 +69,7 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/otherwise');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -89,9 +89,9 @@ class GetTest extends TestCase
     public function testWithPrefix(): void
     {
         $request = new ServerRequest([], [], '/admins/dashboard');
-        $router = new Router;
+        $router = new Next;
 
-        $router->getStore()
+        $router->getStoreLayers()
             ->setPrefix('/admins')
             ->get('/admins/dashboard', function ($request, $next) { // /admins/admins/dashboard
                 throw new \Exception('must skip');

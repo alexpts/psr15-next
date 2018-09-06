@@ -4,21 +4,21 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\CallableToMiddleware;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class MiddlewareTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Router;
+        $this->router = new Next;
     }
 
     public function testSimple(): void
@@ -30,12 +30,12 @@ class MiddlewareTest extends TestCase
         };
         $middleware = new CallableToMiddleware($next);
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->middleware($middleware)
             ->use($next)
             ->getLayerFactory()->callable($next);
 
-        $this->router->getStore()->get('/', function ($request, $next) {
+        $this->router->getStoreLayers()->get('/', function ($request, $next) {
             return new JsonResponse(['status' => 200]);
         });
         /** @var JsonResponse $response */
@@ -48,7 +48,7 @@ class MiddlewareTest extends TestCase
     {
         $request = new ServerRequest([], [], '/main');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -66,7 +66,7 @@ class MiddlewareTest extends TestCase
     {
         $request = new ServerRequest([], [], '/otherwise');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -86,9 +86,9 @@ class MiddlewareTest extends TestCase
     public function testWithPrefix(): void
     {
         $request = new ServerRequest([], [], '/admins/dashboard');
-        $router = new Router;
+        $router = new Next;
 
-        $router->getStore()
+        $router->getStoreLayers()
             ->setPrefix('/admins')
             ->get('/admins/dashboard', function ($request, $next) { // /admins/admins/dashboard
                 throw new \Exception('must skip');

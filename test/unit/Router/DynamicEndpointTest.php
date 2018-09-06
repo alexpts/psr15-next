@@ -1,25 +1,25 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class DynamicEndpointTest extends TestCase
 {
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
-        $this->router = new Router;
+        $this->router = new Next;
     }
 
     public function testEndPoint(): void
     {
         $request = new ServerRequest([], [], '/user-controller/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['prefix' => 'PTS\\NextRouter\\Controller\\'];
         $layer = $store->getLayerFactory()->dynamicEndPoint($endPoint, ['path' => '/{_controller}/']);
@@ -33,7 +33,7 @@ class DynamicEndpointTest extends TestCase
     public function testBadEndpointError(): void
     {
         $request = new ServerRequest([], [], '/user-controller/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['prefix' => 'PTS\\NextRouter\\Controller\\', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->dynamicEndPoint($endPoint, ['path' => '/user-controller/']);

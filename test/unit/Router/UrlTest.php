@@ -2,14 +2,14 @@
 
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Extra\UrlCreator;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 
 
 class UrlTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
     /** @var UrlCreator */
     protected $urlCreator;
@@ -18,13 +18,13 @@ class UrlTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Router;
+        $this->router = new Next;
         $this->urlCreator = new UrlCreator($this->router);
     }
 
     public function testGood(): void
     {
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/users/{id}/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             }, 'user');

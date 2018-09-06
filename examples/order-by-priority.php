@@ -2,18 +2,16 @@
 declare(strict_types=1);
 
 use PTS\NextRouter\LayerResolver;
-use PTS\NextRouter\Router;
-use PTS\PSR15\Middlewares\ResponseEmit;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 require_once '../vendor/autoload.php';
 
-$app = new Router(new LayerResolver);
-$responseEmitter = require 'include/ResponseEmitter.php';
+$app = new Next(new LayerResolver);
 
-$app->getStore()
-    ->middleware(new ResponseEmit($responseEmitter))
+$app->getStoreLayers()
     ->use(function () {
         return new JsonResponse(['message' => 'otherwise']);
     }, ['priority' => 100]) // will run after route
@@ -23,4 +21,5 @@ $app->getStore()
 
 $request = ServerRequestFactory::fromGlobals();
 $response = $app->handle($request);
+(new SapiEmitter)->emit($response);
 

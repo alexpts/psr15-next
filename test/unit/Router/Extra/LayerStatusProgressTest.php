@@ -9,7 +9,7 @@ use PTS\NextRouter\Extra\HttpContext;
 use PTS\NextRouter\Extra\LayerStatusProgress;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use PTS\NextRouter\Runner;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
@@ -17,7 +17,7 @@ use Zend\Diactoros\ServerRequest;
 class LayerStatusProgressTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
     /** @var EventsInterface */
     protected $events;
@@ -27,7 +27,7 @@ class LayerStatusProgressTest extends TestCase
         parent::setUp();
 
         $this->events = new Events;
-        $this->router = new Router(new LayerResolver);
+        $this->router = new Next(new LayerResolver);
         $this->router->setEvents($this->events);
     }
 
@@ -44,7 +44,7 @@ class LayerStatusProgressTest extends TestCase
         $this->events->on(Runner::EVENT_BEFORE_NEXT, [$progressService, 'setProgressLayer']);
         $this->events->on(Runner::EVENT_AFTER_NEXT, [$progressService, 'setCompleteLayer']);
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->use(function (ServerRequestInterface $request, RequestHandlerInterface $next) {
                 /** @var JsonResponse $response */
                 $response = $next->handle($request);

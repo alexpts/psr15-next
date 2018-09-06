@@ -3,28 +3,28 @@
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\LayerResolver;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class UseTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Router(new LayerResolver);
+        $this->router = new Next(new LayerResolver);
     }
 
     public function testMethod(): void
     {
         $request = new ServerRequest();
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });
@@ -39,7 +39,7 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest();
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->use(function ($request, RequestHandlerInterface $next) {
                 return $next->handle($request);
             })
@@ -57,7 +57,7 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest();
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->use(function ($request, $next) {
                 return new JsonResponse(['name' => 'A']);
             }, ['path' => '/blog'])

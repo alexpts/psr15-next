@@ -4,21 +4,21 @@ declare(strict_types=1);
 namespace PTS\NextRouter\Extra;
 
 use PTS\NextRouter\Layer;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 
 class UrlCreator
 {
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
-    public function __construct(Router $router)
+    public function __construct(Next $router)
     {
         $this->router = $router;
     }
 
     public function url(string $name, array $placeholders = [], array $options = []): ?string
     {
-        $layer = $this->router->getStore()->findLayerByName($name);
+        $layer = $this->router->getStoreLayers()->findLayerByName($name);
         return $layer ? $this->create($layer, $placeholders, $options) : null;
     }
 

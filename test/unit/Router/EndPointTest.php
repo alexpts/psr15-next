@@ -2,26 +2,26 @@
 
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Controller\UserController;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class EndPointTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
-        $this->router = new Router;
+        $this->router = new Next;
     }
 
     public function testEndPoint(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -37,7 +37,7 @@ class EndPointTest extends TestCase
     public function testEndPointReuse(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class, 'reuse' => true];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -56,7 +56,7 @@ class EndPointTest extends TestCase
     public function testBacController(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['controller' => 'UnknownClass', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -72,7 +72,7 @@ class EndPointTest extends TestCase
     public function testBacAction(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class, 'action' => 'unknown', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -88,7 +88,7 @@ class EndPointTest extends TestCase
     public function testBacControllerNext(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['controller' => 'UnknownClass', 'nextOnError' => true];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -106,7 +106,7 @@ class EndPointTest extends TestCase
     public function testFilterMatches(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStore();
+        $store = $this->router->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [

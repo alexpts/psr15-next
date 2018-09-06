@@ -9,7 +9,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response;
 
 class OptionsMiddleware implements MiddlewareInterface
@@ -19,10 +19,10 @@ class OptionsMiddleware implements MiddlewareInterface
     /** @var LayerResolver */
     protected $resolver;
 
-    public function __construct(Router $router)
+    public function __construct(Next $app)
     {
-        $this->layers = $router->getStore()->getLayers();
-        $this->resolver = $router->getStore()->getResolver();
+        $this->layers = $app->getStoreLayers()->getLayers();
+        $this->resolver = $app->getStoreLayers()->getResolver();
     }
 
     /**

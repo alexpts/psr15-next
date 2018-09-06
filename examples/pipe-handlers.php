@@ -2,15 +2,15 @@
 declare(strict_types=1);
 
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use PTS\PSR15\Middlewares\ResponseEmit;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 require_once '../vendor/autoload.php';
 
-$app = new Router;
-$responseEmitter = require 'include/ResponseEmitter.php';
+$app = new Next;
 
 $handler = [
     'fetch user' => function (ServerRequestInterface $request, $next) {
@@ -28,8 +28,7 @@ $handler = [
     },
 ];
 
-$app->getStore()
-    ->middleware(new ResponseEmit($responseEmitter))
+$app->getStoreLayers()
     ->pipe($handler, ['path' => '/users', 'method' => ['GET']])
     ->use(function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'otherwise']);
@@ -37,4 +36,5 @@ $app->getStore()
 
 $request = ServerRequestFactory::fromGlobals();
 $response = $app->handle($request);
+(new SapiEmitter)->emit($response);
 

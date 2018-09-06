@@ -2,28 +2,28 @@
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class PipeMethodTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Router;
+        $this->router = new Next;
     }
 
     public function testMethod(): void
     {
         $request = new ServerRequest([], [], '/profile', 'GET');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 'user']);
             })
@@ -53,7 +53,7 @@ class PipeMethodTest extends TestCase
     {
         $request = new ServerRequest([], [], '/profile', 'GET');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             ->get('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 'user']);
             })

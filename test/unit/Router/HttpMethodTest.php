@@ -2,28 +2,28 @@
 
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\LayerResolver;
-use PTS\NextRouter\Router;
+use PTS\NextRouter\Next;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequest;
 
 class HttpMethodTest extends TestCase
 {
 
-    /** @var Router */
+    /** @var Next */
     protected $router;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Router(new LayerResolver);
+        $this->router = new Next(new LayerResolver);
     }
 
     public function testSimple(): void
     {
         $request = new ServerRequest([], [], '/');
 
-        $this->router->getStore()
+        $this->router->getStoreLayers()
             // expected skip by http method
             ->post('/', function ($request, $next) {
                 return new JsonResponse(['method' => 'post']);

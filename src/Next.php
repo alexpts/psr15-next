@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\EventsInterface;
 
-class Router implements RequestHandlerInterface
+class Next implements RequestHandlerInterface
 {
     public const EVENT_BEFORE_HANDLE = 'router.before.handle';
 
@@ -38,7 +38,7 @@ class Router implements RequestHandlerInterface
         return $this;
     }
 
-    public function getStore(): StoreLayers
+    public function getStoreLayers(): StoreLayers
     {
         return $this->store;
     }
@@ -46,15 +46,15 @@ class Router implements RequestHandlerInterface
     /**
      * Merge/mount external router to current router
      *
-     * @param Router $router
+     * @param Next $app
      * @param string|null $path
      *
-     * @return Router
+     * @return Next
      */
-    public function mount(Router $router, string $path = null): self
+    public function mount(Next $app, string $path = null): self
     {
-        foreach ($router->store->getLayers() as $layer) {
-            if (!$path) {
+        foreach ($app->store->getLayers() as $layer) {
+            if (null === $path) {
                 $this->store->addLayer($layer);
                 continue;
             }

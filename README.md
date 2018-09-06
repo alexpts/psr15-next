@@ -6,7 +6,7 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alexpts/psr15-next/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alexpts/psr15-next/?branch=master)
 
 
-Router for PSR-15 middlewares. Base for micro framework.
+Runner for PSR-15 middlewares.
 
 
 [See examples](https://github.com/alexpts/psr15-next/tree/master/examples)
