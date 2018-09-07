@@ -21,3 +21,33 @@ Runner for PSR-15 middlewares.
 * PSR-7 request/response
 * Flexible priority (low level)
 * Dynamic endpoint (low level)
+
+
+```php
+
+use Psr\Http\Message\ServerRequestInterface;
+use PTS\NextRouter\LayerResolver;
+use PTS\NextRouter\Next;
+use PTS\PSR15\Middlewares\ErrorToJsonResponse;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\ServerRequestFactory;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
+
+require_once '../vendor/autoload.php';
+
+$app = new Next;
+
+$app->getStoreLayers()
+    ->middleware(new ErrorToJsonResponse(true))
+    ->get('/hello', function (ServerRequestInterface $request, $next) {
+        return new JsonResponse(['message' => 'Hello world'], 200);
+    })
+    ->use(function (ServerRequestInterface $request, $next) {
+        return new JsonResponse(['message' => 'otherwise']);
+    });
+
+$request = ServerRequestFactory::fromGlobals();
+$response = $app->handle($request);
+(new SapiEmitter)->emit($response);
+
+```
