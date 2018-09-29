@@ -51,3 +51,8 @@ $response = $app->handle($request);
 (new SapiEmitter)->emit($response);
 
 ```
+
+
+### Install
+
+`composer require alexpts/psr15-next`
