@@ -23,16 +23,19 @@ class RestrictionInPathTest extends TestCase
 
     public function testSimple(): void
     {
-        $request = new ServerRequest([], [], '/users/alex/');
+    	$resolver = new LayerResolver;
+
+    	$request = new ServerRequest([], [], '/users/alex/');
         $request2 = new ServerRequest([], [], '/users/5/');
 
-        $route = new Layer('/users/{id}/', new CallableToMiddleware(function ($request, $next) {
+        $layer = new Layer('/users/{id}/', new CallableToMiddleware(function ($request, $next) {
             return new JsonResponse(['status' => 'user route']);
         }));
-        $route->setRestrictions(['id' => '\d+']);
+		$layer->restrictions = ['id' => '\d+'];
+		$layer->regexp = $resolver->makeRegExp($layer);
 
         $this->router->getStoreLayers()
-            ->addLayer($route)
+            ->addLayer($layer)
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 'otherwise']);
             });

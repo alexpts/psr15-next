@@ -10,37 +10,39 @@ class WithPriorityTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
-        $this->router = new Next;
+        $this->app = new Next;
     }
 
     public function testPriorityLayers(): void
     {
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });
 
-        foreach (['a' => 20, 'b' => 50, 'c' => 50, 'd' => 40] as $name => $priority) {
+        $data = ['a' => 20, 'b' => 50, 'c' => 50, 'd' => 40, 'e' => 0];
+        foreach ($data as $name => $priority) {
             $layer = new Layer('/', new CallableToMiddleware(function () use($name) {
                 return new JsonResponse(['name' => $name]);
-            }), $name);
-            $layer->setPriority($priority);
-            $this->router->getStoreLayers()->addLayer($layer);
+            }));
+            $layer->name = $name;
+            $layer->meta['priority'] = $priority;
+            $this->app->getStoreLayers()->addLayer($layer);
         }
 
-        $this->router->getStoreLayers()->sortByPriority();
+        $this->app->getStoreLayers()->sortByPriority();
 
         /** @var JsonResponse $response */
-        $layers = $this->router->getStoreLayers()->getLayers();
+        $layers = $this->app->getStoreLayers()->getLayers();
         $actual = array_map(function (Layer $layer) {
             return $layer->name;
         }, $layers);
 
-        $this->assertSame(['a', 'd', 'layer-0', 'b', 'c'], $actual);
+        $this->assertSame(['e', 'a', 'd', 'layer-0', 'b', 'c'], $actual);
     }
 }

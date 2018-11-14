@@ -17,9 +17,9 @@ class StoreLayers
     /** @var LayerFactory */
     protected $layerFactory;
 
-    public function __construct(LayerResolver $resolver)
+    public function __construct(LayerResolver $resolver = null)
     {
-        $this->resolver = $resolver;
+        $this->resolver = $resolver ?? new LayerResolver;
         $this->layerFactory = new LayerFactory;
     }
 
@@ -37,7 +37,7 @@ class StoreLayers
     public function addLayer(Layer $layer): self
     {
         $layer->name = $layer->name ?? 'layer-'.$this->autoincrement;
-        $layer->makeRegExp($this->resolver);
+        $layer->regexp = $this->resolver->makeRegExp($layer);
         $this->layers[] = $layer;
 
         $this->autoincrement++;
@@ -122,18 +122,21 @@ class StoreLayers
         return $this->method('PATCH', $path, $handler, ['name' => $name]);
     }
 
-    public function sortByPriority(): self
-    {
-        usort($this->layers, function (Layer $a, Layer $b) {
-            if ($a->priority === $b->priority) {
-                return 0;
-            }
+	public function sortByPriority(): self
+	{
+		usort($this->layers, function (Layer $a, Layer $b) {
+			$priorityA = $a->meta['priority'] ?? 50;
+			$priorityB = $b->meta['priority'] ?? 50;
 
-            return $a->priority < $b->priority ? -1 : 1;
-        });
+			if ($priorityA === $priorityB) {
+				return 0;
+			}
 
-        return $this;
-    }
+			return $priorityA < $priorityB ? -1 : 1;
+		});
+
+		return $this;
+	}
 
     public function getLastLayer(): ?Layer
     {

@@ -8,18 +8,19 @@ use Psr\Http\Server\MiddlewareInterface;
 class Layer
 {
 
-    public const TYPE_MIDDLEWARE = 'middleware';
-    public const TYPE_ROUTE = 'route';
+    public const TYPE_MIDDLEWARE = 2;
+    public const TYPE_ROUTE = 1;
 
     /** @var string|null */
     public $path;
     /** @var MiddlewareInterface */
     public $md;
-    /** @var int */
-    public $priority = 50;
-    public $type = self::TYPE_MIDDLEWARE;
+
     /** @var string|null */
     public $name;
+
+    /** @var array any data for extend layer */
+    public $meta = [];
 
     /** @var array */
     public $methods = [];
@@ -32,41 +33,10 @@ class Layer
     /** @var string - regexp от path */
     public $regexp;
 
-    public function __construct(?string $path, MiddlewareInterface $md, string $name = null)
+    public function __construct(?string $path, MiddlewareInterface $md)
     {
         $this->path = $path;
-        $this->name = $name;
         $this->md = $md;
-    }
-
-    public function setPriority(int $priority = 50): self
-    {
-        $this->priority = $priority;
-        return $this;
-    }
-
-    public function setMethods(array $methods = []): self
-    {
-        $this->methods = $methods;
-        return $this;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    public function makeRegExp(LayerResolver $resolver): self
-    {
-        $this->regexp = $resolver->makeRegExp($this);
-        return $this;
-    }
-
-    public function setRestrictions(array $restrictions): self
-    {
-        $this->restrictions = $restrictions;
-        return $this;
     }
 
     public function __clone()

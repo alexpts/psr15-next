@@ -12,8 +12,15 @@ class LayerFactory
 {
     /** @var string */
     protected $prefix = '';
+    /** @var LayerResolver */
+    protected $resolver;
 
-    public function setPrefix(string $prefix = ''): void
+    public function __construct()
+	{
+		$this->resolver = new LayerResolver;
+	}
+
+	public function setPrefix(string $prefix = ''): void
     {
         $this->prefix = $prefix;
     }
@@ -25,21 +32,22 @@ class LayerFactory
 
     public function middleware(MiddlewareInterface $md, array $options = []): Layer
     {
-        $name = $options['name'] ?? null;
         $path = $options['path'] ?? null;
-        $priority = $options['priority'] ?? 50;
         $method = $options['method'] ?? [];
-        $type = $options['type'] ?? Layer::TYPE_MIDDLEWARE;
 
-        return $this->makeLayer($md, $path, $name)
-            ->setPriority($priority)
-            ->setType($type)
-            ->setMethods((array)$method);
+        $layer = $this->makeLayer($md, $path);
+		$layer->name = $options['name'] ?? null;
+		$layer->methods = (array)$method;
+		$layer->meta['type'] = $options['type'] ?? Layer::TYPE_MIDDLEWARE;
+        return $layer;
     }
 
-    public function makeLayer(MiddlewareInterface $md, string $path = null, string $name = null): Layer
+    public function makeLayer(MiddlewareInterface $md, string $path = null): Layer
     {
-        return new Layer($this->getFullPath($path), $md, $name);
+        $layer = new Layer($this->getFullPath($path), $md);
+		$layer->regexp = $this->resolver->makeRegExp($layer);
+
+		return $layer;
     }
 
     public function endPoint(array $params, array $options = []): Layer
