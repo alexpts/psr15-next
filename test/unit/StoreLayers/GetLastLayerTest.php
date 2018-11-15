@@ -26,10 +26,10 @@ class GetLastLayerTest extends TestCase
         $this->store
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['status' => 'a']);
-            }, 'a')
+            }, ['name' => 'a'])
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['status' => 'b']);
-            }, 'b');
+            }, ['name' => 'b']);
 
         $layer = $this->store->getLastLayer();
         $this->assertInstanceOf(Layer::class, $layer);

@@ -26,7 +26,7 @@ class CreateUrlTest extends TestCase
         $this->router->getStoreLayers()
             ->get('/users/{id}/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
-            }, 'user');
+            }, ['name' => 'user']);
         $query = ['format' => 'json', 'rel' => 'site'];
 
         $path = $this->urlCreator->url('user', ['id' => 34], ['query' => $query]);

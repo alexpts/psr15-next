@@ -53,7 +53,7 @@ class LayerStatusProgressTest extends TestCase
             })
             ->get('/', function (ServerRequestInterface $request, $next) {
                 return new JsonResponse(['activeLayers' => []]);
-            }, 'main-page')
+            }, ['name' => 'main-page'])
             ->use(function (ServerRequestInterface $request, RequestHandlerInterface $next) {
                 return $next->handle($request);
             }, ['path' => '/not-active-layer', 'name' => 'bad-md'])
