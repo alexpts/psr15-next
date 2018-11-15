@@ -9,16 +9,16 @@ use PTS\NextRouter\Next;
 class UrlCreator
 {
     /** @var Next */
-    protected $router;
+    protected $app;
 
-    public function __construct(Next $router)
+    public function __construct(Next $app)
     {
-        $this->router = $router;
+        $this->app = $app;
     }
 
     public function url(string $name, array $placeholders = [], array $options = []): ?string
     {
-        $layer = $this->router->getStoreLayers()->findLayerByName($name);
+        $layer = $this->app->getStoreLayers()->findLayerByName($name);
         return $layer ? $this->create($layer, $placeholders, $options) : null;
     }
 

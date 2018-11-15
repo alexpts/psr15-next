@@ -10,12 +10,13 @@ use PTS\Events\EventsInterface;
 
 class Next implements RequestHandlerInterface
 {
-    public const EVENT_BEFORE_HANDLE = 'router.before.handle';
+	use EmitterTrait;
+
+    public const EVENT_BEFORE_HANDLE = 'app.before.handle';
+    public const EVENT_AFTER_HANDLE = 'app.after.handle';
 
     /** @var StoreLayers */
     protected $store;
-    /** @var EventsInterface|null */
-    protected $events;
     /** @var Runner */
     protected $runner;
 
@@ -77,7 +78,10 @@ class Next implements RequestHandlerInterface
         $allowLayers = $this->store->getLayersForRequest($request);
         $this->runner->setLayers($allowLayers);
 
-        $this->events && $this->events->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers]);
-        return $this->runner->handle($request);
+        $this->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers]);
+        $response = $this->runner->handle($request);
+		$this->emit(self::EVENT_AFTER_HANDLE, [$request, $allowLayers, $response]);
+
+		return $response;
     }
 }

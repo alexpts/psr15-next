@@ -10,18 +10,18 @@ class EndPointTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
-        $this->router = new Next;
+        $this->app = new Next;
     }
 
     public function testEndPoint(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStoreLayers();
+        $store = $this->app->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -30,14 +30,14 @@ class EndPointTest extends TestCase
         $store->addLayer($layer);
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
         $this->assertSame(['action' => 'main'], $response->getPayload());
     }
 
     public function testEndPointReuse(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStoreLayers();
+        $store = $this->app->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class, 'reuse' => true];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -46,9 +46,9 @@ class EndPointTest extends TestCase
         $store->addLayer($layer);
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
         /** @var JsonResponse $response2 */
-        $response2 = $this->router->handle($request);
+        $response2 = $this->app->handle($request);
         $this->assertSame(['action' => 'main'], $response->getPayload());
         $this->assertSame(['action' => 'main'], $response2->getPayload());
     }
@@ -56,7 +56,7 @@ class EndPointTest extends TestCase
     public function testBacController(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStoreLayers();
+        $store = $this->app->getStoreLayers();
 
         $endPoint = ['controller' => 'UnknownClass', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -66,13 +66,13 @@ class EndPointTest extends TestCase
 
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Controller not found');
-        $this->router->handle($request);
+        $this->app->handle($request);
     }
 
     public function testBacAction(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStoreLayers();
+        $store = $this->app->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class, 'action' => 'unknown', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -82,13 +82,13 @@ class EndPointTest extends TestCase
 
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Action not found');
-        $this->router->handle($request);
+        $this->app->handle($request);
     }
 
     public function testBacControllerNext(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStoreLayers();
+        $store = $this->app->getStoreLayers();
 
         $endPoint = ['controller' => 'UnknownClass', 'nextOnError' => true];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -99,14 +99,14 @@ class EndPointTest extends TestCase
         });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
         $this->assertSame(['action' => 'otherwise'], $response->getPayload());
     }
 
     public function testFilterMatches(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->router->getStoreLayers();
+        $store = $this->app->getStoreLayers();
 
         $endPoint = ['controller' => UserController::class];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -120,7 +120,7 @@ class EndPointTest extends TestCase
         ]);
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
         $this->assertSame(['action' => 'get'], $response->getPayload());
     }
 }

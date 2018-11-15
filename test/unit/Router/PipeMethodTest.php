@@ -10,20 +10,20 @@ class PipeMethodTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Next;
+        $this->app = new Next;
     }
 
     public function testMethod(): void
     {
         $request = new ServerRequest([], [], '/profile', 'GET');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 'user']);
             })
@@ -44,7 +44,7 @@ class PipeMethodTest extends TestCase
             }, ['name' => 'otherwise']);
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 404, 'pipe2' => true, 'pipe1' => true], $response->getPayload());
     }
@@ -53,7 +53,7 @@ class PipeMethodTest extends TestCase
     {
         $request = new ServerRequest([], [], '/profile', 'GET');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/user', function ($request, $next) {
                 return new JsonResponse(['status' => 'user']);
             })
@@ -70,7 +70,7 @@ class PipeMethodTest extends TestCase
             ], ['method' => ['GET'], 'path' => '/profile']);
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['pipe2' => true, 'pipe1' => true], $response->getPayload());
     }

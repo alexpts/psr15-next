@@ -10,20 +10,20 @@ class HttpMethodTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Next(new LayerResolver);
+        $this->app = new Next(new LayerResolver);
     }
 
     public function testSimple(): void
     {
         $request = new ServerRequest([], [], '/');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             // expected skip by http method
             ->post('/', function ($request, $next) {
                 return new JsonResponse(['method' => 'post']);
@@ -36,7 +36,7 @@ class HttpMethodTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['method' => 'get'], $response->getPayload());
     }

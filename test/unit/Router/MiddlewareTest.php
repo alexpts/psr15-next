@@ -12,13 +12,13 @@ class MiddlewareTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Next;
+        $this->app = new Next;
     }
 
     public function testSimple(): void
@@ -30,16 +30,16 @@ class MiddlewareTest extends TestCase
         };
         $middleware = new CallableToMiddleware($next);
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->middleware($middleware)
             ->use($next)
             ->getLayerFactory()->callable($next);
 
-        $this->router->getStoreLayers()->get('/', function ($request, $next) {
+        $this->app->getStoreLayers()->get('/', function ($request, $next) {
             return new JsonResponse(['status' => 200]);
         });
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 200], $response->getPayload());
     }
@@ -48,7 +48,7 @@ class MiddlewareTest extends TestCase
     {
         $request = new ServerRequest([], [], '/main');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -57,7 +57,7 @@ class MiddlewareTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 'main'], $response->getPayload());
     }
@@ -66,7 +66,7 @@ class MiddlewareTest extends TestCase
     {
         $request = new ServerRequest([], [], '/otherwise');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -78,7 +78,7 @@ class MiddlewareTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 'otherwise'], $response->getPayload());
     }

@@ -10,7 +10,7 @@ class UrlTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
     /** @var UrlCreator */
     protected $urlCreator;
 
@@ -18,13 +18,13 @@ class UrlTest extends TestCase
     {
         parent::setUp();
 
-        $this->router = new Next;
-        $this->urlCreator = new UrlCreator($this->router);
+        $this->app = new Next;
+        $this->urlCreator = new UrlCreator($this->app);
     }
 
     public function testGood(): void
     {
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/users/{id}/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             }, ['name' => 'user']);

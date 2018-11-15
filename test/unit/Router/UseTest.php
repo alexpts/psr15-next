@@ -11,26 +11,26 @@ class UseTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Next(new LayerResolver);
+        $this->app = new Next(new LayerResolver);
     }
 
     public function testMethod(): void
     {
         $request = new ServerRequest();
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->use(function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 200], $response->getPayload());
     }
@@ -39,7 +39,7 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest();
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->use(function ($request, RequestHandlerInterface $next) {
                 return $next->handle($request);
             })
@@ -48,7 +48,7 @@ class UseTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 202], $response->getPayload());
     }
@@ -57,7 +57,7 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest();
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->use(function ($request, $next) {
                 return new JsonResponse(['name' => 'A']);
             }, ['path' => '/blog'])
@@ -66,7 +66,7 @@ class UseTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['name' => 'B'], $response->getPayload());
     }

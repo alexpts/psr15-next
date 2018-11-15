@@ -10,19 +10,19 @@ class MountTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Next(new LayerResolver);
+        $this->app = new Next(new LayerResolver);
     }
 
     public function testMount(): void
     {
         $request = new ServerRequest([], [], '/');
-        $router2 = clone $this->router;
+        $router2 = clone $this->app;
 
         $router2->getStoreLayers()
             ->use(function ($request, $next) {
@@ -33,7 +33,7 @@ class MountTest extends TestCase
             }, ['path' => '/']);
 
         /** @var JsonResponse $response */
-        $response = $this->router
+        $response = $this->app
             ->mount($router2, '/api')
             ->handle($request);
 
@@ -43,7 +43,7 @@ class MountTest extends TestCase
     public function testMountWithoutPath(): void
     {
         $request = new ServerRequest([], [], '/');
-        $router2 = clone $this->router;
+        $router2 = clone $this->app;
 
         $router2->getStoreLayers()
             ->use(function ($request, $next) {
@@ -54,7 +54,7 @@ class MountTest extends TestCase
             }, ['path' => '/']);
 
         /** @var JsonResponse $response */
-        $response = $this->router
+        $response = $this->app
             ->mount($router2)
             ->handle($request);
 

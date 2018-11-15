@@ -9,25 +9,25 @@ class GetTest extends TestCase
 {
 
     /** @var Next */
-    protected $router;
+    protected $app;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->router = new Next;
+        $this->app = new Next;
     }
 
     public function testSimple(): void
     {
         $request = new ServerRequest([], [], '/');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/', function ($request, $next) {
                 return new JsonResponse(['status' => 200]);
             });
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 200], $response->getPayload());
     }
@@ -35,7 +35,7 @@ class GetTest extends TestCase
     public function testInvoke(): void
     {
         $request = new ServerRequest([], [], '/');
-        $router = $this->router;
+        $router = $this->app;
 
         $router->getStoreLayers()
             ->get('/', function ($request, $next) {
@@ -51,7 +51,7 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/main');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -60,7 +60,7 @@ class GetTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 'main'], $response->getPayload());
     }
@@ -69,7 +69,7 @@ class GetTest extends TestCase
     {
         $request = new ServerRequest([], [], '/otherwise');
 
-        $this->router->getStoreLayers()
+        $this->app->getStoreLayers()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
@@ -81,7 +81,7 @@ class GetTest extends TestCase
             });
 
         /** @var JsonResponse $response */
-        $response = $this->router->handle($request);
+        $response = $this->app->handle($request);
 
         $this->assertSame(['status' => 'otherwise'], $response->getPayload());
     }
