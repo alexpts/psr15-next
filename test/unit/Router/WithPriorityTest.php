@@ -31,7 +31,7 @@ class WithPriorityTest extends TestCase
                 return new JsonResponse(['name' => $name]);
             }));
             $layer->name = $name;
-            $layer->meta['priority'] = $priority;
+            $layer->priority = $priority;
             $this->app->getStoreLayers()->addLayer($layer);
         }
 

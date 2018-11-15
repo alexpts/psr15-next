@@ -16,7 +16,7 @@ class LayerStatusProgress
         $context->replaceState('router.layers.active', array_map(function(Layer $layer) {
             return [
                 'name' => $layer->name,
-                'type' => $layer->meta['type'] ?? Layer::TYPE_MIDDLEWARE,
+                'type' => $layer->type,
                 'regexp' => $layer->regexp,
                 'status' => 'pending'
             ];

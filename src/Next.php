@@ -67,7 +67,12 @@ class Next implements RequestHandlerInterface
         return $this;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+	/**
+	 * @inheritdoc
+	 *
+	 * @throws \Throwable
+	 */
+	public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $allowLayers = $this->store->getLayersForRequest($request);
         $this->runner->setLayers($allowLayers);

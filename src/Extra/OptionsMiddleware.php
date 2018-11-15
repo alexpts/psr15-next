@@ -32,8 +32,7 @@ class OptionsMiddleware implements MiddlewareInterface
     {
         $activeLayers = $this->findActiveLayersWithoutHttpMethodCheck($request);
         $supportMethods = array_reduce($activeLayers, function(array $acc, Layer $layer) {
-        	$type = $layer->meta['type'] ?? Layer::TYPE_MIDDLEWARE;
-        	if ($type === Layer::TYPE_ROUTE) {
+        	if ($layer->type === Layer::TYPE_ROUTE) {
                 $acc = array_merge($acc, $layer->methods);
             }
 

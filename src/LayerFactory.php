@@ -10,8 +10,7 @@ use PTS\NextRouter\Extra\PipeStack;
 
 class LayerFactory
 {
-    /** @var string */
-    protected $prefix = '';
+
     /** @var LayerResolver */
     protected $resolver;
 
@@ -19,11 +18,6 @@ class LayerFactory
 	{
 		$this->resolver = new LayerResolver;
 	}
-
-	public function setPrefix(string $prefix = ''): void
-    {
-        $this->prefix = $prefix;
-    }
 
     public function callable(callable $handler, array $options = []): Layer
     {
@@ -38,13 +32,14 @@ class LayerFactory
         $layer = $this->makeLayer($md, $path);
 		$layer->name = $options['name'] ?? null;
 		$layer->methods = (array)$method;
-		$layer->meta['type'] = $options['type'] ?? Layer::TYPE_MIDDLEWARE;
-        return $layer;
+		$layer->type = $options['type'] ?? Layer::TYPE_MIDDLEWARE;
+
+		return $layer;
     }
 
     public function makeLayer(MiddlewareInterface $md, string $path = null): Layer
     {
-        $layer = new Layer($this->getFullPath($path), $md);
+        $layer = new Layer($path, $md);
 		$layer->regexp = $this->resolver->makeRegExp($layer);
 
 		return $layer;
@@ -76,10 +71,5 @@ class LayerFactory
         }
 
         return $this->middleware($pipe, $options);
-    }
-
-    protected function getFullPath(string $path = null): ?string
-    {
-        return null === $path ? null : $this->prefix.$path;
     }
 }

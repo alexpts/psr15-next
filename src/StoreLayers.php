@@ -10,12 +10,14 @@ class StoreLayers
 {
     /** @var LayerResolver */
     protected $resolver;
-    /** @var array */
+    /** @var Layer[] */
     protected $layers = [];
     /** @var int */
     protected $autoincrement = 0;
     /** @var LayerFactory */
     protected $layerFactory;
+    /** @var string */
+    protected $prefix = '';
 
     public function __construct(LayerResolver $resolver = null)
     {
@@ -30,16 +32,13 @@ class StoreLayers
 
     public function setPrefix(string $prefix): self
     {
-        $this->layerFactory->setPrefix($prefix);
+        $this->prefix = $prefix;
         return $this;
     }
 
     public function addLayer(Layer $layer): self
     {
-        $layer->name = $layer->name ?? 'layer-'.$this->autoincrement;
-        $layer->regexp = $this->resolver->makeRegExp($layer);
-        $this->layers[] = $layer;
-
+        $this->layers[] = $this->normalizerLayer($layer);
         $this->autoincrement++;
         return $this;
     }
@@ -125,8 +124,8 @@ class StoreLayers
 	public function sortByPriority(): self
 	{
 		usort($this->layers, function (Layer $a, Layer $b) {
-			$priorityA = $a->meta['priority'] ?? 50;
-			$priorityB = $b->meta['priority'] ?? 50;
+			$priorityA = $a->priority ?? 50;
+			$priorityB = $b->priority ?? 50;
 
 			if ($priorityA === $priorityB) {
 				return 0;
@@ -165,4 +164,17 @@ class StoreLayers
     {
         return $this->layerFactory;
     }
+
+	protected function normalizerLayer(Layer $layer): Layer
+	{
+		$layer->path = $this->getFullPath($layer->path);
+		$layer->name = $layer->name ?? 'layer-'.$this->autoincrement;
+		$layer->regexp = $this->resolver->makeRegExp($layer);
+		return $layer;
+	}
+
+	protected function getFullPath(string $path = null): ?string
+	{
+		return null === $path ? null : $this->prefix.$path;
+	}
 }

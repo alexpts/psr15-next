@@ -19,19 +19,20 @@ class Layer
     /** @var string|null */
     public $name;
 
-    /** @var array any data for extend layer */
-    public $meta = [];
-
     /** @var array */
     public $methods = [];
     /** @var array */
     public $matches = [];
     /** @var array */
     public $restrictions = [];
-    /** @var string */
 
     /** @var string - regexp от path */
-    public $regexp;
+    public $regexp = '';
+
+	/** @var int */
+	public $priority = 50;
+	/** @var int */
+	public $type = self::TYPE_MIDDLEWARE;
 
     public function __construct(?string $path, MiddlewareInterface $md)
     {
