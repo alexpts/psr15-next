@@ -50,6 +50,13 @@ class LayerResolver
         return \count($allows) ? \in_array($method, $allows, true) : true;
     }
 
+    /**
+     * @param Layer[] $layers
+     * @param RequestInterface $request
+     * @param bool $checkMethod
+     *
+     * @return array
+     */
     public function findActiveLayers(array $layers, RequestInterface $request, bool $checkMethod = true): array
     {
         $activeLayers = array_filter($layers, function(Layer $layer) use($checkMethod, $request) {
@@ -57,6 +64,23 @@ class LayerResolver
         });
 
         return array_values($activeLayers);
+    }
+
+    /**
+     * @param Layer[] $layers
+     * @param string $name
+     *
+     * @return Layer|null
+     */
+    public function findLayerByName(array $layers, string $name): ?Layer
+    {
+        foreach ($layers as $layer) {
+            if ($layer->path && $layer->name === $name) {
+                return $layer;
+            }
+        }
+
+        return null;
     }
 
     public function isActiveLayer(Layer $layer, RequestInterface $request, $checkMethod = true): bool

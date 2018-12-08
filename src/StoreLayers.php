@@ -8,6 +8,8 @@ use Psr\Http\Server\MiddlewareInterface;
 
 class StoreLayers
 {
+    use FastMethods;
+
     /** @var LayerResolver */
     protected $resolver;
     /** @var Layer[] */
@@ -45,7 +47,8 @@ class StoreLayers
 
     public function use(callable $handler, array $options = []): self
     {
-        return $this->middleware(new CallableToMiddleware($handler), $options);
+        $md = new CallableToMiddleware($handler);
+        return $this->middleware($md, $options);
     }
 
     public function middleware(MiddlewareInterface $md, array $options = []): self
@@ -76,13 +79,7 @@ class StoreLayers
 
     public function findLayerByName(string $name): ?Layer
     {
-        foreach ($this->layers as $layer) {
-            if ($layer->path && $layer->name === $name) {
-                return $layer;
-            }
-        }
-
-        return null;
+        return $this->resolver->findLayerByName($this->layers, $name);
     }
 
     public function method(string $method, string $path, callable $handler, array $options = []): self
@@ -92,33 +89,8 @@ class StoreLayers
             $options,
             ['path' => $path, 'method' => (array)$method]
         );
-        $layer = $this->layerFactory->middleware(new CallableToMiddleware($handler), $options);
+        $layer = $this->getLayerFactory()->middleware(new CallableToMiddleware($handler), $options);
         return $this->addLayer($layer);
-    }
-
-    public function get(string $path, callable $handler, array $options = []): self
-    {
-        return $this->method('GET', $path, $handler, $options);
-    }
-
-    public function delete(string $path, callable $handler, array $options = []): self
-    {
-        return $this->method('DELETE', $path, $handler, $options);
-    }
-
-    public function post(string $path, callable $handler, array $options = []): self
-    {
-        return $this->method('POST', $path, $handler, $options);
-    }
-
-    public function put(string $path, callable $handler, array $options = []): self
-    {
-        return $this->method('PUT', $path, $handler, $options);
-    }
-
-    public function patch(string $path, callable $handler, array $options = []): self
-    {
-        return $this->method('PATCH', $path, $handler, $options);
     }
 
 	public function sortByPriority(): self
