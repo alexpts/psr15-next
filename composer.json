@@ -30,7 +30,7 @@
         "alexpts/php-simple-events": "^3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.3",
+        "phpunit/phpunit": "^7.5",
         "zendframework/zend-diactoros": "^1.8",
         "alexpts/psr15-middlewares": "^1.15"
     },
