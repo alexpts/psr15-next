@@ -33,6 +33,7 @@ class LayerFactory
 		$layer->name = $options['name'] ?? null;
 		$layer->methods = (array)$method;
 		$layer->type = $options['type'] ?? Layer::TYPE_MIDDLEWARE;
+		$layer->priority = $options['priority'] ?? $layer->priority ;
 
 		return $layer;
     }
@@ -107,6 +108,8 @@ class LayerFactory
     {
         if (is_array($handler) && is_string($handler[0])) {
             $handler[0] = new $handler[0];
+        } elseif (is_string($handler) && !is_callable($handler)) {
+            $handler = new $handler;
         }
 
         return $handler;
