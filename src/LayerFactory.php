@@ -72,4 +72,43 @@ class LayerFactory
 
         return $this->middleware($pipe, $options);
     }
+
+    public function create(array $params): Layer
+    {
+        $md = $this->getMiddlewareFromParams($params);
+        $layer = $this->makeLayer($md, $params['path'] ?? null);
+
+        foreach ($params as $name => $value) {
+            if (property_exists($layer, $name)) {
+                $layer->{$name} = $value;
+            }
+        }
+
+        return $layer;
+    }
+
+    protected function getMiddlewareFromParams(array $params): MiddlewareInterface
+    {
+        if (array_key_exists('callable', $params)) {
+            $callable = $this->prepareCallable($params['callable']);
+            $md = new CallableToMiddleware($callable);
+        } elseif (array_key_exists('endpoint', $params)) {
+            $md = new EndPoint($params['endpoint']);
+        } elseif (array_key_exists('dynamicPoint', $params)) {
+            $md = new DynamicPoint($params['dynamicPoint']);
+        } else {
+            throw new RouterException('Unknown type');
+        }
+
+        return $md;
+    }
+
+    protected function prepareCallable($handler): callable
+    {
+        if (is_array($handler) && is_string($handler[0])) {
+            $handler[0] = new $handler[0];
+        }
+
+        return $handler;
+    }
 }
