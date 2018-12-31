@@ -20,6 +20,11 @@ class FromParamsTest extends TestCase
         return new JsonResponse(['message' => 'staticAction']);
     }
 
+    public function __invoke()
+    {
+        return new JsonResponse(['message' => 'invoke']);
+    }
+
     public function action(): ResponseInterface
     {
         return new JsonResponse(['message' => 'action']);
@@ -109,6 +114,42 @@ class FromParamsTest extends TestCase
         $request = new ServerRequest([], [], '/');
         $response = $app->handle($request);
         static::assertSame('{"message":"action"}', $response->getBody()->getContents());
+    }
+
+    public function testCreateFromSymfonyFormatMethod(): void
+    {
+        $factory = new LayerFactory;
+        $config = [
+            'path' => '/',
+            'callable' => 'FromParamsTest:action',
+        ];
+
+        $layer = $factory->create($config);
+        static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
+
+        $app = new Next;
+        $app->getStoreLayers()->addLayer($layer);
+        $request = new ServerRequest([], [], '/');
+        $response = $app->handle($request);
+        static::assertSame('{"message":"action"}', $response->getBody()->getContents());
+    }
+
+    public function testCreateFromObject(): void
+    {
+        $factory = new LayerFactory;
+        $config = [
+            'path' => '/',
+            'callable' => 'FromParamsTest',
+        ];
+
+        $layer = $factory->create($config);
+        static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
+
+        $app = new Next;
+        $app->getStoreLayers()->addLayer($layer);
+        $request = new ServerRequest([], [], '/');
+        $response = $app->handle($request);
+        static::assertSame('{"message":"invoke"}', $response->getBody()->getContents());
     }
 
     public function testCreateUnknown(): void

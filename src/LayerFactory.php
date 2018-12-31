@@ -106,12 +106,23 @@ class LayerFactory
 
     protected function prepareCallable($handler): callable
     {
-        if (is_array($handler) && is_string($handler[0])) {
+        if (is_string($handler) && !is_callable($handler)) {
+            $handler = $this->symfonyCallableFormat($handler) ?? new $handler;
+        } elseif (is_array($handler) && is_string($handler[0])) {
             $handler[0] = new $handler[0];
-        } elseif (is_string($handler) && !is_callable($handler)) {
-            $handler = new $handler;
         }
 
         return $handler;
+    }
+
+    protected function symfonyCallableFormat($handler): ?callable
+    {
+        if (is_string($handler) && strpos($handler, ':')) {
+            $handler = explode(':', $handler);
+            $handler[0] = new $handler[0];
+            return $handler;
+        }
+
+        return null;
     }
 }
