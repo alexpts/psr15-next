@@ -95,18 +95,16 @@ class StoreLayers
 
 	public function sortByPriority(): self
 	{
-		usort($this->layers, function (Layer $a, Layer $b) {
-			$priorityA = $a->priority ?? 50;
-			$priorityB = $b->priority ?? 50;
+        $sorted = [];
 
-			if ($priorityA === $priorityB) {
-				return 0;
-			}
+        foreach ($this->layers as $layer) {
+            $sorted[$layer->priority][] = $layer;
+        }
 
-			return $priorityA < $priorityB ? -1 : 1;
-		});
+        ksort($sorted, SORT_NUMERIC);
+        $this->layers = array_merge(...$sorted);
 
-		return $this;
+        return $this;
 	}
 
     public function getLastLayer(): ?Layer
