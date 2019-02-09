@@ -10,19 +10,20 @@ use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\StoreLayers;
 use Zend\Diactoros\Response;
 
 class OptionsMiddleware implements MiddlewareInterface
 {
-    /** @var Layer[]  */
-    protected $layers;
+    /** @var StoreLayers */
+    protected $store;
     /** @var LayerResolver */
     protected $resolver;
 
     public function __construct(Next $app)
     {
-        $this->layers = $app->getStoreLayers()->getLayers();
-        $this->resolver = $app->getStoreLayers()->getResolver();
+        $this->store = $app->getStoreLayers();
+        $this->resolver = $this->store->getResolver();
     }
 
     /**
@@ -32,17 +33,19 @@ class OptionsMiddleware implements MiddlewareInterface
     {
         $activeLayers = $this->findActiveLayersWithoutHttpMethodCheck($request);
         $supportMethods = array_reduce($activeLayers, function(array $acc, Layer $layer) {
-        	if ($layer->type === Layer::TYPE_ROUTE) {
-                $acc = array_merge($acc, $layer->methods);
+            if ($layer->type === Layer::TYPE_ROUTE) {
+                array_push($acc, ...$layer->methods);
             }
 
             return $acc;
-        }, ['OPTIONS']);
+        }, []);
 
         $supportMethods = array_unique($supportMethods);
-        if (\count($supportMethods) <= 1) {
+        if (!\count($supportMethods)) {
             return $next->handle($request);
         }
+
+        $supportMethods[] = 'OPTIONS';
 
         $response = new Response;
         return $response->withHeader('Access-Control-Allow-Methods', implode(', ', $supportMethods));
@@ -55,6 +58,6 @@ class OptionsMiddleware implements MiddlewareInterface
      */
     protected function findActiveLayersWithoutHttpMethodCheck(ServerRequestInterface $request): array
     {
-        return $this->resolver->findActiveLayers($this->layers, $request, false);
+        return $this->resolver->findActiveLayers( $this->store->getLayers(), $request, false);
     }
 }

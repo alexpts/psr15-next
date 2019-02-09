@@ -40,7 +40,7 @@ class AllowedMethodsTest extends TestCase
         $response = $this->app->handle($request);
 
         $this->assertTrue($response->hasHeader('Access-Control-Allow-Methods'));
-        $this->assertSame('OPTIONS, GET, DELETE', $response->getHeaderLine('Access-Control-Allow-Methods'));
+        $this->assertSame('GET, DELETE, OPTIONS', $response->getHeaderLine('Access-Control-Allow-Methods'));
     }
 
     public function testUnknownPath(): void
