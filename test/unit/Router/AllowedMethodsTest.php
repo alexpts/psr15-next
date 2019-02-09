@@ -16,7 +16,7 @@ class AllowedMethodsTest extends TestCase
     /** @var LayerResolver */
     protected $resolver;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

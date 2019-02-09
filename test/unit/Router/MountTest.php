@@ -12,7 +12,7 @@ class MountTest extends TestCase
     /** @var Next */
     protected $app;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
