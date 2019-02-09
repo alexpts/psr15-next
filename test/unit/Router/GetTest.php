@@ -11,7 +11,7 @@ class GetTest extends TestCase
     /** @var Next */
     protected $app;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

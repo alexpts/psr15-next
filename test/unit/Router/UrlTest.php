@@ -14,7 +14,7 @@ class UrlTest extends TestCase
     /** @var UrlCreator */
     protected $urlCreator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

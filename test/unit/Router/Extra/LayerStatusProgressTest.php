@@ -22,7 +22,7 @@ class LayerStatusProgressTest extends TestCase
     /** @var EventsInterface */
     protected $events;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
