@@ -31,6 +31,22 @@ class OptionsMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
+        $supportMethods = [];
+
+        if ($request->getMethod() === 'OPTIONS') {
+            $supportMethods = $this->getSupportMethods($request);
+        }
+
+        if ($supportMethods) {
+            $response = new Response;
+            return $response->withHeader('Access-Control-Allow-Methods', implode(', ', $supportMethods));
+        }
+
+        return $next->handle($request);
+    }
+
+    protected function getSupportMethods($request): array
+    {
         $activeLayers = $this->findActiveLayersWithoutHttpMethodCheck($request);
         $supportMethods = array_reduce($activeLayers, function(array $acc, Layer $layer) {
             if ($layer->type === Layer::TYPE_ROUTE && $layer->methods) {
@@ -41,14 +57,11 @@ class OptionsMiddleware implements MiddlewareInterface
         }, []);
 
         $supportMethods = array_unique($supportMethods);
-        if (!$supportMethods) {
-            return $next->handle($request);
+        if ($supportMethods) {
+            $supportMethods[] = 'OPTIONS';
         }
 
-        $supportMethods[] = 'OPTIONS';
-
-        $response = new Response;
-        return $response->withHeader('Access-Control-Allow-Methods', implode(', ', $supportMethods));
+        return $supportMethods;
     }
 
     /**
@@ -58,6 +71,6 @@ class OptionsMiddleware implements MiddlewareInterface
      */
     protected function findActiveLayersWithoutHttpMethodCheck(ServerRequestInterface $request): array
     {
-        return $this->resolver->findActiveLayers( $this->store->getLayers(), $request, false);
+        return $this->resolver->findActiveLayers($this->store->getLayers(), $request, false);
     }
 }
