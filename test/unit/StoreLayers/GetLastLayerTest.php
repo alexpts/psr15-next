@@ -12,7 +12,7 @@ class GetLastLayerTest extends TestCase
     /** @var StoreLayers */
     protected $store;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

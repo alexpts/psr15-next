@@ -30,9 +30,9 @@
         "alexpts/php-simple-events": "^3.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.5",
-        "zendframework/zend-diactoros": "^1.8",
-        "alexpts/psr15-middlewares": "^1.15"
+        "phpunit/phpunit": "^8.0",
+        "zendframework/zend-diactoros": "^2.1",
+        "alexpts/psr15-middlewares": "^1.16"
     },
     "autoload": {
         "psr-4": {
