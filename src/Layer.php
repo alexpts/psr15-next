@@ -34,6 +34,9 @@ class Layer
 	/** @var int */
 	public $type = self::TYPE_MIDDLEWARE;
 
+	/** @var array */
+	public $context = [];
+
     public function __construct(?string $path, MiddlewareInterface $md)
     {
         $this->path = $path;
