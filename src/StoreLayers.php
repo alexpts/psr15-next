@@ -9,6 +9,9 @@ use Psr\Http\Server\MiddlewareInterface;
 class StoreLayers
 {
     use FastMethods;
+    use EmitterTrait;
+
+    public const EVENT_ADD_LAYER = 'store.layers.add';
 
     /** @var LayerResolver */
     protected $resolver;
@@ -41,6 +44,7 @@ class StoreLayers
     public function addLayer(Layer $layer): self
     {
         $this->layers[] = $this->normalizerLayer($layer);
+        $this->emit(self::EVENT_ADD_LAYER, [$layer, $this]);
         $this->autoincrement++;
         return $this;
     }

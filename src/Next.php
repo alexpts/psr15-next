@@ -36,6 +36,7 @@ class Next implements RequestHandlerInterface
     {
         $this->events = $events;
         $this->runner->setEvents($events);
+        $this->store->setEvents($events);
         return $this;
     }
 
