@@ -35,8 +35,6 @@ class WithPriorityTest extends TestCase
             $this->app->getStoreLayers()->addLayer($layer);
         }
 
-        $this->app->getStoreLayers()->sortByPriority();
-
         /** @var JsonResponse $response */
         $layers = $this->app->getStoreLayers()->getLayers();
         $actual = array_map(function (Layer $layer) {

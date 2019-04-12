@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PTS\NextRouter;
 
+use function count;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 
@@ -23,6 +24,8 @@ class StoreLayers
     protected $layerFactory;
     /** @var string */
     protected $prefix = '';
+
+    protected $sorted = false;
 
     public function __construct(LayerResolver $resolver = null)
     {
@@ -45,7 +48,10 @@ class StoreLayers
     {
         $this->layers[] = $this->normalizerLayer($layer);
         $this->emit(self::EVENT_ADD_LAYER, [$layer, $this]);
+
         $this->autoincrement++;
+        $this->sorted = false;
+
         return $this;
     }
 
@@ -68,6 +74,10 @@ class StoreLayers
      */
     public function getLayers(): array
     {
+        if ($this->sorted === false) {
+            $this->sortByPriority();
+        }
+
         return $this->layers;
     }
 
@@ -78,12 +88,12 @@ class StoreLayers
      */
     public function getLayersForRequest(ServerRequestInterface $request): array
     {
-        return $this->resolver->findActiveLayers($this->layers, $request);
+        return $this->resolver->findActiveLayers($this->getLayers(), $request);
     }
 
     public function findLayerByName(string $name): ?Layer
     {
-        return $this->resolver->findLayerByName($this->layers, $name);
+        return $this->resolver->findLayerByName($this->getLayers(), $name);
     }
 
     public function method(string $method, string $path, callable $handler, array $options = []): self
@@ -97,23 +107,27 @@ class StoreLayers
         return $this->addLayer($layer);
     }
 
-	public function sortByPriority(): self
+	protected function sortByPriority(): self
 	{
-        $sorted = [];
+	    if ($this->layers) {
+            $sorted = [];
 
-        foreach ($this->layers as $layer) {
-            $sorted[$layer->priority][] = $layer;
+            foreach ($this->layers as $layer) {
+                $sorted[$layer->priority][] = $layer;
+            }
+
+            ksort($sorted, SORT_NUMERIC);
+            $this->layers = array_merge(...$sorted);
         }
 
-        ksort($sorted, SORT_NUMERIC);
-        $this->layers = array_merge(...$sorted);
-
+        $this->sorted = true;
         return $this;
 	}
 
     public function getLastLayer(): ?Layer
     {
-        $count = \count($this->layers);
+        $layers = $this->getLayers();
+        $count = count($layers);
         return $count ? $this->layers[$count -1] : null;
     }
 
