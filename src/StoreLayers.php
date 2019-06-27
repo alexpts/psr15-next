@@ -38,13 +38,23 @@ class StoreLayers
         return $this->resolver;
     }
 
-    public function setPrefix(string $prefix): self
+    /**
+     * @param string $prefix
+     *
+     * @return $this
+     */
+    public function setPrefix(string $prefix)
     {
         $this->prefix = $prefix;
         return $this;
     }
 
-    public function addLayer(Layer $layer): self
+    /**
+     * @param Layer $layer
+     *
+     * @return $this
+     */
+    public function addLayer(Layer $layer)
     {
         $this->layers[] = $this->normalizerLayer($layer);
         $this->emit(self::EVENT_ADD_LAYER, [$layer, $this]);
@@ -55,13 +65,25 @@ class StoreLayers
         return $this;
     }
 
-    public function use(callable $handler, array $options = []): self
+    /**
+     * @param callable $handler
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function use(callable $handler, array $options = [])
     {
         $md = new CallableToMiddleware($handler);
         return $this->middleware($md, $options);
     }
 
-    public function middleware(MiddlewareInterface $md, array $options = []): self
+    /**
+     * @param MiddlewareInterface $md
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function middleware(MiddlewareInterface $md, array $options = [])
     {
         $layer = $this->layerFactory->middleware($md, $options);
         $this->addLayer($layer);
@@ -96,7 +118,15 @@ class StoreLayers
         return $this->resolver->findLayerByName($this->getLayers(), $name);
     }
 
-    public function method(string $method, string $path, callable $handler, array $options = []): self
+    /**
+     * @param string $method
+     * @param string $path
+     * @param callable $handler
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function method(string $method, string $path, callable $handler, array $options = [])
     {
         $options = array_merge(
             ['type' => Layer::TYPE_ROUTE],
@@ -107,7 +137,10 @@ class StoreLayers
         return $this->addLayer($layer);
     }
 
-	protected function sortByPriority(): self
+    /**
+     * @return $this
+     */
+	protected function sortByPriority()
 	{
 	    if ($this->layers) {
             $sorted = [];
@@ -138,7 +171,7 @@ class StoreLayers
      *
      * @return $this
      */
-    public function pipe(array $handlers, array $options = [], string $path = null): self
+    public function pipe(array $handlers, array $options = [], string $path = null)
     {
         $layer = $this->layerFactory->pipe($handlers, array_merge([
             'path' => $path,

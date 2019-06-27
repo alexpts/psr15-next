@@ -29,9 +29,9 @@ class HttpContext
      * @param string $name
      * @param mixed $state
      *
-     * @return HttpContext
+     * @return $this
      */
-    public function replaceState(string $name, $state): self
+    public function replaceState(string $name, $state)
     {
         $this->state[$name] = $state;
         return $this;

@@ -32,7 +32,12 @@ class Next implements RequestHandlerInterface
         return $this->handle($request);
     }
 
-    public function setEvents(EventsInterface $events): self
+    /**
+     * @param EventsInterface $events
+     *
+     * @return $this
+     */
+    public function setEvents(EventsInterface $events)
     {
         $this->events = $events;
         $this->runner->setEvents($events);
@@ -51,9 +56,9 @@ class Next implements RequestHandlerInterface
      * @param Next $app
      * @param string|null $path
      *
-     * @return Next
+     * @return $this
      */
-    public function mount(Next $app, string $path = null): self
+    public function mount(Next $app, string $path = null)
     {
         foreach ($app->store->getLayers() as $layer) {
             if (null === $path) {
