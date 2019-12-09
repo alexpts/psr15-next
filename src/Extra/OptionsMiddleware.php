@@ -15,10 +15,8 @@ use Zend\Diactoros\Response;
 
 class OptionsMiddleware implements MiddlewareInterface
 {
-    /** @var StoreLayers */
-    protected $store;
-    /** @var LayerResolver */
-    protected $resolver;
+    protected StoreLayers $store;
+    protected LayerResolver $resolver;
 
     public function __construct(Next $app)
     {

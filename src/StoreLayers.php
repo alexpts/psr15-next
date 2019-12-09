@@ -14,18 +14,14 @@ class StoreLayers
 
     public const EVENT_ADD_LAYER = 'store.layers.add';
 
-    /** @var LayerResolver */
-    protected $resolver;
+    protected LayerResolver $resolver;
     /** @var Layer[] */
-    protected $layers = [];
-    /** @var int */
-    protected $autoincrement = 0;
-    /** @var LayerFactory */
-    protected $layerFactory;
-    /** @var string */
-    protected $prefix = '';
+    protected array $layers = [];
+    protected int $autoincrement = 0;
+    protected LayerFactory $layerFactory;
+    protected string $prefix = '';
 
-    protected $sorted = false;
+    protected bool $sorted = false;
 
     public function __construct(LayerResolver $resolver = null)
     {

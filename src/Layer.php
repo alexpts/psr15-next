@@ -11,31 +11,23 @@ class Layer
     public const TYPE_MIDDLEWARE = 2;
     public const TYPE_ROUTE = 1;
 
-    /** @var string|null */
-    public $path;
-    /** @var MiddlewareInterface */
-    public $md;
+    public ?string $path;
+    public MiddlewareInterface $md;
 
     /** @var string|null */
-    public $name;
+    public ?string $name = '';
 
-    /** @var array */
-    public $methods = [];
-    /** @var array */
-    public $matches = [];
-    /** @var array */
-    public $restrictions = [];
+    public array $methods = [];
+    public array $matches = [];
+    public array $restrictions = [];
 
     /** @var string - regexp от path */
-    public $regexp = '';
+    public ?string $regexp = '';
 
-	/** @var int */
-	public $priority = 50;
-	/** @var int */
-	public $type = self::TYPE_MIDDLEWARE;
+	public int $priority = 50;
+	public int $type = self::TYPE_MIDDLEWARE;
 
-	/** @var array */
-	public $context = [];
+	public array $context = [];
 
     public function __construct(?string $path, MiddlewareInterface $md)
     {

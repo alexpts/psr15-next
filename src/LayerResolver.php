@@ -3,6 +3,8 @@
 namespace PTS\NextRouter;
 
 use Psr\Http\Message\RequestInterface;
+use function count;
+use function in_array;
 
 class LayerResolver
 {
@@ -47,7 +49,7 @@ class LayerResolver
     public function isAllowMethod(Layer $layer, string $method): bool
     {
         $allows = $layer->methods;
-        return \count($allows) ? \in_array($method, $allows, true) : true;
+        return count($allows) ? in_array($method, $allows, true) : true;
     }
 
     /**
@@ -59,9 +61,7 @@ class LayerResolver
      */
     public function findActiveLayers(array $layers, RequestInterface $request, bool $checkMethod = true): array
     {
-        $activeLayers = array_filter($layers, function(Layer $layer) use($checkMethod, $request) {
-            return $this->isActiveLayer($layer, $request, $checkMethod);
-        });
+        $activeLayers = array_filter($layers, fn(Layer $layer) => $this->isActiveLayer($layer, $request, $checkMethod));
 
         return array_values($activeLayers);
     }

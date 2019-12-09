@@ -11,11 +11,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 class PipeStack implements MiddlewareInterface, RequestHandlerInterface
 {
     /** @var MiddlewareInterface[] */
-    protected $middlewares = [];
-    /** @var int */
-    protected $index = 0;
-    /** @var RequestHandlerInterface */
-    protected $next;
+    protected array $middlewares = [];
+    protected int $index = 0;
+    protected RequestHandlerInterface $next;
 
     public function add(MiddlewareInterface $middleware): void
     {

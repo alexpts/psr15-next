@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PTS\NextRouter\Extra\EndPoint;
 
+use BadMethodCallException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -10,17 +11,15 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class EndPoint implements MiddlewareInterface
 {
-    /** @var string|null */
-    protected $controller;
-    /** @var string|null */
-    protected $action;
-    /** @var bool */
-    protected $nextOnError = true;
+
+    protected ?string $controller = null;
+    protected ?string $action = null;
+    protected bool $nextOnError = true;
 
     /** @var bool - reuse a controller for many requests */
-    protected $reuse = false;
+    protected bool $reuse = false;
     /** @var MiddlewareInterface[] - cache for reuse controllers */
-    protected $cache = [];
+    protected array $cache = [];
 
     public function __construct(array $params = [])
     {
@@ -36,13 +35,13 @@ class EndPoint implements MiddlewareInterface
      * @param RequestHandlerInterface $next
      *
      * @return ResponseInterface
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $next): ResponseInterface
     {
         try {
             $endPoint = $this->getPoint($request);
-        } catch (\BadMethodCallException $exception) {
+        } catch (BadMethodCallException $exception) {
             if (!$this->nextOnError) {
                 throw $exception;
             }
@@ -62,7 +61,7 @@ class EndPoint implements MiddlewareInterface
      * @param ServerRequestInterface $request
      *
      * @return callable
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     protected function getPoint(ServerRequestInterface $request): callable
     {
@@ -109,25 +108,25 @@ class EndPoint implements MiddlewareInterface
     /**
      * @param string $controller
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     protected function checkController(string $controller): void
     {
         if (!class_exists($controller)) {
-            throw new \BadMethodCallException('Controller not found');
+            throw new BadMethodCallException('Controller not found');
         }
     }
 
     /**
-     * @param \object $controller
+     * @param object $controller
      * @param string $action
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      */
     protected function checkAction($controller, string $action): void
     {
         if (!method_exists($controller, $action)) {
-            throw new \BadMethodCallException('Action not found');
+            throw new BadMethodCallException('Action not found');
         }
     }
 

@@ -8,8 +8,7 @@ use PTS\NextRouter\Next;
 
 class UrlCreator
 {
-    /** @var Next */
-    protected $app;
+    protected Next $app;
 
     public function __construct(Next $app)
     {

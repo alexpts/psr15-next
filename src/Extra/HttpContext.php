@@ -8,12 +8,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class HttpContext
 {
-    /** @var ServerRequestInterface */
-    public $request;
+    public ServerRequestInterface $request;
     /** @var ResponseInterface|null */
-    public $response;
-    /** @var array */
-    public $state = [];
+    public ?ResponseInterface $response = null;
+    public array $state = [];
 
     public function setRequest(ServerRequestInterface $request): void
     {

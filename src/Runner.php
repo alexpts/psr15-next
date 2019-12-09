@@ -17,9 +17,8 @@ class Runner implements RequestHandlerInterface
     public const EVENT_AFTER_NEXT = 'router.runner.after.next';
 
     /** @var Layer[] */
-    protected $layers = [];
-    /** @var int */
-    protected $index = 0;
+    protected array $layers = [];
+    protected int $index = 0;
 
 
     public function setLayers(array $activeLayers): void

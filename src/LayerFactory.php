@@ -11,8 +11,7 @@ use PTS\NextRouter\Extra\PipeStack;
 class LayerFactory
 {
 
-    /** @var LayerResolver */
-    protected $resolver;
+    protected LayerResolver $resolver;
 
     public function __construct()
 	{

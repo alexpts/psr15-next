@@ -3,18 +3,19 @@ declare(strict_types=1);
 
 namespace PTS\NextRouter\Extra\EndPoint;
 
+use BadMethodCallException;
 use Psr\Http\Message\ServerRequestInterface;
 
 class DynamicPoint extends EndPoint
 {
-    /** @var string */
-    protected $prefix = '';
+
+    protected string $prefix = '';
 
     protected function getControllerClass(ServerRequestInterface $request): string
     {
         $matches = $request->getAttribute('params', []);
         if (!array_key_exists('_controller', $matches)) {
-            throw new \BadMethodCallException('Not found controller name for dynamic controller point');
+            throw new BadMethodCallException('Not found controller name for dynamic controller point');
         }
 
         return $this->prefix.$this->normalizeClassFromUrl($matches['_controller']);

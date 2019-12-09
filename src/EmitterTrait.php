@@ -7,8 +7,8 @@ use PTS\Events\EventsInterface;
 
 trait EmitterTrait
 {
-	/** @var EventsInterface|null */
-	protected $events;
+
+	protected ?EventsInterface $events = null;
 
 	public function setEvents(EventsInterface $events): void
 	{

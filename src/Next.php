@@ -7,6 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\EventsInterface;
+use Throwable;
 
 class Next implements RequestHandlerInterface
 {
@@ -15,14 +16,12 @@ class Next implements RequestHandlerInterface
     public const EVENT_BEFORE_HANDLE = 'app.before.handle';
     public const EVENT_AFTER_HANDLE = 'app.after.handle';
 
-    /** @var StoreLayers */
-    protected $store;
-    /** @var Runner */
-    protected $runner;
+    protected StoreLayers $store;
+    protected Runner $runner;
 
     public function __construct(LayerResolver $resolver = null)
     {
-        $resolver = $resolver ?? new LayerResolver;
+        $resolver ??= new LayerResolver;
         $this->store = new StoreLayers($resolver);
         $this->runner = new Runner;
     }
@@ -77,7 +76,7 @@ class Next implements RequestHandlerInterface
 	/**
 	 * @inheritdoc
 	 *
-	 * @throws \Throwable
+	 * @throws Throwable
 	 */
 	public function handle(ServerRequestInterface $request): ResponseInterface
     {
