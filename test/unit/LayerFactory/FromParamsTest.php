@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use PTS\NextRouter\CallableToMiddleware;
@@ -10,8 +12,6 @@ use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerFactory;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\RouterException;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class FromParamsTest extends TestCase
 {

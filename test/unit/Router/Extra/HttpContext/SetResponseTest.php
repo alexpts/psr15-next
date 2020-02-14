@@ -1,8 +1,8 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Extra\HttpContext;
-use Zend\Diactoros\Response\JsonResponse;
 
 class SetResponseTest extends TestCase
 {

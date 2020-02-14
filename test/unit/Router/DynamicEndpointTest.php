@@ -1,14 +1,13 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class DynamicEndpointTest extends TestCase
 {
-    /** @var Next */
-    protected $app;
+    protected Next $app;
 
     protected function setUp(): void
     {
@@ -39,7 +38,7 @@ class DynamicEndpointTest extends TestCase
         $layer = $store->getLayerFactory()->dynamicEndPoint($endPoint, ['path' => '/user-controller/']);
         $store->addLayer($layer);
 
-        $this->expectException(\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Not found controller name for dynamic controller point');
         $this->app->handle($request);
     }

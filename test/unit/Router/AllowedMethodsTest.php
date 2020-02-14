@@ -1,20 +1,18 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\Events\Events;
 use PTS\NextRouter\Extra\OptionsMiddleware;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class AllowedMethodsTest extends TestCase
 {
 
-    /** @var Next */
-    protected $app;
-    /** @var LayerResolver */
-    protected $resolver;
+    protected Next $app;
+    protected LayerResolver $resolver;
 
     protected function setUp(): void
     {

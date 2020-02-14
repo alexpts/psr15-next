@@ -1,18 +1,17 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\CallableToMiddleware;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class RestrictionInPathTest extends TestCase
 {
 
-    /** @var Next */
-    protected $app;
+    protected Next $app;
 
     protected function setUp(): void
     {

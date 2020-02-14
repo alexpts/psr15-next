@@ -1,5 +1,7 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -11,16 +13,12 @@ use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Runner;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class LayerStatusProgressTest extends TestCase
 {
 
-    /** @var Next */
-    protected $router;
-    /** @var EventsInterface */
-    protected $events;
+    protected Next $router;
+    protected EventsInterface $events;
 
     protected function setUp(): void
     {

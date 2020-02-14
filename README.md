@@ -25,13 +25,13 @@ Runner for PSR-15 middlewares.
 
 ```php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 require_once '../vendor/autoload.php';
 

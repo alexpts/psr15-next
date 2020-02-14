@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace PTS\NextRouter\Extra;
 
+use Laminas\Diactoros\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -11,7 +12,6 @@ use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\StoreLayers;
-use Zend\Diactoros\Response;
 
 class OptionsMiddleware implements MiddlewareInterface
 {

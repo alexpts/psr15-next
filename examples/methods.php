@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 require_once '../vendor/autoload.php';
 

@@ -1,17 +1,15 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Extra\UrlCreator;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
 
 class CreateUrlTest extends TestCase
 {
 
-    /** @var Next */
-    protected $router;
-    /** @var UrlCreator */
-    protected $urlCreator;
+    protected Next $router;
+    protected UrlCreator $urlCreator;
 
     protected function setUp(): void
     {

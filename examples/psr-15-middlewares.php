@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequestFactory;
-use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 
 require_once '../vendor/autoload.php';
 
@@ -16,10 +16,10 @@ $app = new Next(new LayerResolver);
 $app->getStoreLayers()
     ->middleware(new ErrorToJsonResponse(true), '/api/.*') // middelware active only /api/* path
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {
-        throw new \Exception('Exception text - will convert to json response');
+        throw new Exception('Exception text - will convert to json response');
     })
     ->get('/users/', function (ServerRequestInterface $request, $next) {
-        throw new \Exception('Exception text - raw');
+        throw new Exception('Exception text - raw');
     })
     ->use(function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'otherwise']);

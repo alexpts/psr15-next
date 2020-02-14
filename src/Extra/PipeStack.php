@@ -7,6 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use function count;
 
 class PipeStack implements MiddlewareInterface, RequestHandlerInterface
 {
@@ -41,7 +42,7 @@ class PipeStack implements MiddlewareInterface, RequestHandlerInterface
         $middleware = $this->middlewares[$this->index];
         $this->index++;
 
-        $next = $this->index === \count($this->middlewares) ? $this->next : $this;
+        $next = $this->index === count($this->middlewares) ? $this->next : $this;
         $response = $middleware->process($request, $next);
 
         $this->index--;

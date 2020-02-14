@@ -1,17 +1,16 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class UseTest extends TestCase
 {
 
-    /** @var Next */
-    protected $app;
+    protected Next $app;
 
     protected function setUp(): void
     {
@@ -22,7 +21,7 @@ class UseTest extends TestCase
 
     public function testMethod(): void
     {
-        $request = new ServerRequest();
+        $request = new ServerRequest;
 
         $this->app->getStoreLayers()
             ->use(function ($request, $next) {

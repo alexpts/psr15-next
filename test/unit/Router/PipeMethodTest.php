@@ -1,16 +1,15 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class PipeMethodTest extends TestCase
 {
 
-    /** @var Next */
-    protected $app;
+    protected Next $app;
 
     protected function setUp(): void
     {

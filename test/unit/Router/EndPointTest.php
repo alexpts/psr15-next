@@ -1,16 +1,15 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Controller\UserController;
 use PTS\NextRouter\Next;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\ServerRequest;
 
 class EndPointTest extends TestCase
 {
 
-    /** @var Next */
-    protected $app;
+    protected Next $app;
 
     protected function setUp(): void
     {

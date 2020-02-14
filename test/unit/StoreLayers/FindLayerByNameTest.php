@@ -1,16 +1,15 @@
 <?php
 
+use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\StoreLayers;
-use Zend\Diactoros\Response\JsonResponse;
 
 class FindLayerByNameTest extends TestCase
 {
 
-    /** @var StoreLayers */
-    protected $store;
+    protected StoreLayers $store;
 
     public function setUp(): void
     {
