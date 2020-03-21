@@ -7,6 +7,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\Events\EventsInterface;
+use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\NextRouter\Resolver\LayerResolverInterface;
 use Throwable;
 
 class Next implements RequestHandlerInterface
@@ -19,7 +21,7 @@ class Next implements RequestHandlerInterface
     protected StoreLayers $store;
     protected Runner $runner;
 
-    public function __construct(LayerResolver $resolver = null)
+    public function __construct(LayerResolverInterface $resolver = null)
     {
         $resolver ??= new LayerResolver;
         $this->store = new StoreLayers($resolver);
@@ -44,7 +46,7 @@ class Next implements RequestHandlerInterface
         return $this;
     }
 
-    public function getStoreLayers(): StoreLayers
+    public function getRouterStore(): StoreLayers
     {
         return $this->store;
     }

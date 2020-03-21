@@ -20,7 +20,7 @@ class EndPointTest extends TestCase
     public function testEndPoint(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['controller' => UserController::class];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -36,7 +36,7 @@ class EndPointTest extends TestCase
     public function testEndPointReuse(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['controller' => UserController::class, 'reuse' => true];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -55,7 +55,7 @@ class EndPointTest extends TestCase
     public function testBacController(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['controller' => 'UnknownClass', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -71,7 +71,7 @@ class EndPointTest extends TestCase
     public function testBacAction(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['controller' => UserController::class, 'action' => 'unknown', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
@@ -87,15 +87,13 @@ class EndPointTest extends TestCase
     public function testBacControllerNext(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['controller' => 'UnknownClass', 'nextOnError' => true];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [
             'path' => '/'
         ]);
-        $store->addLayer($layer)->use(function (){
-            return new JsonResponse(['action' => 'otherwise']);
-        });
+        $store->addLayer($layer)->use(fn() => new JsonResponse(['action' => 'otherwise']));
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
@@ -105,7 +103,7 @@ class EndPointTest extends TestCase
     public function testFilterMatches(): void
     {
         $request = new ServerRequest([], [], '/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['controller' => UserController::class];
         $layer = $store->getLayerFactory()->endPoint($endPoint, [

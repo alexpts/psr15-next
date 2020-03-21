@@ -5,15 +5,15 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
 
 require_once '../vendor/autoload.php';
 
 $app = new Next(new LayerResolver);
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->middleware(new ErrorToJsonResponse(true), '/api/.*') // middelware active only /api/* path
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {
         throw new Exception('Exception text - will convert to json response');

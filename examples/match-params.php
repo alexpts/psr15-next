@@ -7,8 +7,8 @@ use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\Events\Events;
 use PTS\NextRouter\Extra\HttpContext;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\Runner;
 
 require_once '../vendor/autoload.php';
@@ -24,19 +24,15 @@ $events->on(Runner::EVENT_BEFORE_NEXT, function (ServerRequestInterface $request
 
 $app = new Next($layerResolver);
 
-$app->getStoreLayers()
-    ->get('/', function (ServerRequestInterface $request, $next) {
-        return new JsonResponse(['message' => 'app']);
-    })
+$app->getRouterStore()
+    ->get('/', fn(ServerRequestInterface $request, $next) => new JsonResponse(['message' => 'app']))
     ->get('/users/{id}/', function (ServerRequestInterface $request, $next) {
         /** @var HttpContext $context */
         $context = $request->getAttribute('context');
         $params = $context->getState('params');
         return new JsonResponse(['message' => 'user: ' . $params['id'] ?? null]);
     })
-    ->use(function (ServerRequestInterface $request, $next) {
-        return new JsonResponse(['message' => 'otherwise']);
-    });
+    ->use(fn(ServerRequestInterface $request, $next) => new JsonResponse(['message' => 'otherwise']));
 
 $request = ServerRequestFactory::fromGlobals(); // /api/users/34/
 $response = $app->handle($request);

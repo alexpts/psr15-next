@@ -21,12 +21,10 @@ class UrlTest extends TestCase
 
     public function testGood(): void
     {
-        $this->app->getStoreLayers()
-            ->get('/users/{id}/', function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            }, ['name' => 'user']);
-        $query = ['format' => 'json', 'rel' => 'site'];
+        $this->app->getRouterStore()
+            ->get('/users/{id}/', fn() => new JsonResponse(['status' => 200]), ['name' => 'user']);
 
+        $query = ['format' => 'json', 'rel' => 'site'];
         $path = $this->urlCreator->url('user', ['id' => 34], ['query' => $query]);
         $expected = '/users/34/?format=json&rel=site';
         $this->assertSame($expected, $path);

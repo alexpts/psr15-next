@@ -29,14 +29,12 @@ class MiddlewareTest extends TestCase
         };
         $middleware = new CallableToMiddleware($next);
 
-        $this->app->getStoreLayers()
+        $this->app->getRouterStore()
             ->middleware($middleware)
             ->use($next)
             ->getLayerFactory()->callable($next);
 
-        $this->app->getStoreLayers()->get('/', function ($request, $next) {
-            return new JsonResponse(['status' => 200]);
-        });
+        $this->app->getRouterStore()->get('/', fn($request, $next) => new JsonResponse(['status' => 200]) );
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
 
@@ -47,13 +45,11 @@ class MiddlewareTest extends TestCase
     {
         $request = new ServerRequest([], [], '/main');
 
-        $this->app->getStoreLayers()
+        $this->app->getRouterStore()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
-            ->get('/main', function ($request, $next) {
-                return new JsonResponse(['status' => 'main']);
-            });
+            ->get('/main', fn($request, $next) => new JsonResponse(['status' => 'main']));
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
@@ -65,16 +61,12 @@ class MiddlewareTest extends TestCase
     {
         $request = new ServerRequest([], [], '/otherwise');
 
-        $this->app->getStoreLayers()
+        $this->app->getRouterStore()
             ->get('/', function ($request, $next) {
                 throw new \Exception('must skip');
             })
-            ->get('/main', function ($request, $next) {
-                return new JsonResponse(['status' => 'main']);
-            })
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 'otherwise']);
-            });
+            ->get('/main', fn($request, $next) => new JsonResponse(['status' => 'main']) )
+            ->use(fn($request, $next) => new JsonResponse(['status' => 'otherwise']) );
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
@@ -87,14 +79,12 @@ class MiddlewareTest extends TestCase
         $request = new ServerRequest([], [], '/admins/dashboard');
         $router = new Next;
 
-        $router->getStoreLayers()
+        $router->getRouterStore()
             ->setPrefix('/admins')
             ->get('/admins/dashboard', function ($request, $next) { // /admins/admins/dashboard
                 throw new \Exception('must skip');
             })
-            ->get('/dashboard', function ($request, $next) {
-                return new JsonResponse(['status' => 'dashboard']);
-            });
+            ->get('/dashboard', fn($request, $next) => new JsonResponse(['status' => 'dashboard']) );
 
         /** @var JsonResponse $response */
         $response = $router->handle($request);

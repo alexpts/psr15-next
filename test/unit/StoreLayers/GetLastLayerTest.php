@@ -3,7 +3,7 @@
 use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Layer;
-use PTS\NextRouter\LayerResolver;
+use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\StoreLayers;
 
 class GetLastLayerTest extends TestCase
@@ -23,12 +23,8 @@ class GetLastLayerTest extends TestCase
         $this->assertNull($this->store->getLastLayer());
 
         $this->store
-            ->get('/', function ($request, $next) {
-                return new JsonResponse(['status' => 'a']);
-            }, ['name' => 'a'])
-            ->get('/', function ($request, $next) {
-                return new JsonResponse(['status' => 'b']);
-            }, ['name' => 'b']);
+            ->get('/', fn($request, $next) => new JsonResponse(['status' => 'a']), ['name' => 'a'])
+            ->get('/', fn($request, $next) => new JsonResponse(['status' => 'b']), ['name' => 'b']);
 
         $layer = $this->store->getLastLayer();
         $this->assertInstanceOf(Layer::class, $layer);

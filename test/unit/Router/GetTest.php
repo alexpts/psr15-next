@@ -8,100 +8,89 @@ use PTS\NextRouter\Next;
 class GetTest extends TestCase
 {
 
-    protected Next $app;
+	protected Next $app;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+	protected function setUp(): void
+	{
+		parent::setUp();
 
-        $this->app = new Next;
-    }
+		$this->app = new Next;
+	}
 
-    public function testSimple(): void
-    {
-        $request = new ServerRequest([], [], '/');
+	public function testSimple(): void
+	{
+		$request = new ServerRequest([], [], '/');
 
-        $this->app->getStoreLayers()
-            ->get('/', function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            });
-        /** @var JsonResponse $response */
-        $response = $this->app->handle($request);
+		$this->app->getRouterStore()
+			->get('/', fn($request, $next) => new JsonResponse(['status' => 200]) );
 
-        $this->assertSame(['status' => 200], $response->getPayload());
-    }
+		/** @var JsonResponse $response */
+		$response = $this->app->handle($request);
 
-    public function testInvoke(): void
-    {
-        $request = new ServerRequest([], [], '/');
-        $router = $this->app;
+		$this->assertSame(['status' => 200], $response->getPayload());
+	}
 
-        $router->getStoreLayers()
-            ->get('/', function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            });
-        /** @var JsonResponse $response */
-        $response = $router($request);
+	public function testInvoke(): void
+	{
+		$request = new ServerRequest([], [], '/');
+		$router = $this->app;
 
-        $this->assertSame(['status' => 200], $response->getPayload());
-    }
+		$router->getRouterStore()
+			->get('/', fn($request, $next) => new JsonResponse(['status' => 200]) );
+		/** @var JsonResponse $response */
+		$response = $router($request);
 
-    public function testSimple2(): void
-    {
-        $request = new ServerRequest([], [], '/main');
+		$this->assertSame(['status' => 200], $response->getPayload());
+	}
 
-        $this->app->getStoreLayers()
-            ->get('/', function ($request, $next) {
-                throw new \Exception('must skip');
-            })
-            ->get('/main', function ($request, $next) {
-                return new JsonResponse(['status' => 'main']);
-            });
+	public function testSimple2(): void
+	{
+		$request = new ServerRequest([], [], '/main');
 
-        /** @var JsonResponse $response */
-        $response = $this->app->handle($request);
+		$this->app->getRouterStore()
+			->get('/', function ($request, $next) {
+				throw new \Exception('must skip');
+			})
+			->get('/main', fn($request, $next) => new JsonResponse(['status' => 'main']) );
 
-        $this->assertSame(['status' => 'main'], $response->getPayload());
-    }
+		/** @var JsonResponse $response */
+		$response = $this->app->handle($request);
 
-    public function testFallback(): void
-    {
-        $request = new ServerRequest([], [], '/otherwise');
+		$this->assertSame(['status' => 'main'], $response->getPayload());
+	}
 
-        $this->app->getStoreLayers()
-            ->get('/', function ($request, $next) {
-                throw new \Exception('must skip');
-            })
-            ->get('/main', function ($request, $next) {
-                return new JsonResponse(['status' => 'main']);
-            })
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 'otherwise']);
-            });
+	public function testFallback(): void
+	{
+		$request = new ServerRequest([], [], '/otherwise');
 
-        /** @var JsonResponse $response */
-        $response = $this->app->handle($request);
+		$this->app->getRouterStore()
+			->get('/', function ($request, $next) {
+				throw new \Exception('must skip');
+			})
+			->get('/main', fn($request, $next) => new JsonResponse(['status' => 'main']) )
+			->use(fn($request, $next) => new JsonResponse(['status' => 'otherwise']) );
 
-        $this->assertSame(['status' => 'otherwise'], $response->getPayload());
-    }
+		/** @var JsonResponse $response */
+		$response = $this->app->handle($request);
 
-    public function testWithPrefix(): void
-    {
-        $request = new ServerRequest([], [], '/admins/dashboard');
-        $router = new Next;
+		$this->assertSame(['status' => 'otherwise'], $response->getPayload());
+	}
 
-        $router->getStoreLayers()
-            ->setPrefix('/admins')
-            ->get('/admins/dashboard', function ($request, $next) { // /admins/admins/dashboard
-                throw new \Exception('must skip');
-            })
-            ->get('/dashboard', function ($request, $next) {
-                return new JsonResponse(['status' => 'dashboard']);
-            });
+	public function testWithPrefix(): void
+	{
+		$request = new ServerRequest([], [], '/admins/dashboard');
+		$router = new Next;
 
-        /** @var JsonResponse $response */
-        $response = $router->handle($request);
+		$router->getRouterStore()
+			->setPrefix('/admins')
+			->get('/admins/dashboard', function($request, $next) { // /admins/admins/dashboard
+				throw new \Exception('must skip');
+			})
+			->get('/dashboard', fn($request, $next) => new JsonResponse(['status' => 'dashboard']) );
 
-        $this->assertSame(['status' => 'dashboard'], $response->getPayload());
-    }
+		/** @var JsonResponse $response */
+		$response = $router->handle($request);
+
+		$this->assertSame(['status' => 'dashboard'], $response->getPayload());
+	}
 }

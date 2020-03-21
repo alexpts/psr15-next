@@ -11,7 +11,7 @@ use PTS\NextRouter\Next;
 require_once '../vendor/autoload.php';
 $app = new Next;
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => "fetch('/api/users/', {method: 'OPTIONS'}).then(response => console.log(response.headers.get(\"Access-Control-Allow-Methods\")))"]);
     })

@@ -10,8 +10,8 @@ use PTS\Events\EventsInterface;
 use PTS\NextRouter\Extra\HttpContext;
 use PTS\NextRouter\Extra\LayerStatusProgress;
 use PTS\NextRouter\Layer;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\Runner;
 
 class LayerStatusProgressTest extends TestCase
@@ -42,22 +42,18 @@ class LayerStatusProgressTest extends TestCase
         $this->events->on(Runner::EVENT_BEFORE_NEXT, [$progressService, 'setProgressLayer']);
         $this->events->on(Runner::EVENT_AFTER_NEXT, [$progressService, 'setCompleteLayer']);
 
-        $this->router->getStoreLayers()
+        $this->router->getRouterStore()
             ->use(function (ServerRequestInterface $request, RequestHandlerInterface $next) {
                 /** @var JsonResponse $response */
                 $response = $next->handle($request);
                 $activeLayers = $request->getAttribute('context')->getState('router.layers.active');
                 return $response->withPayload(['activeLayers' => $activeLayers]);
             })
-            ->get('/', function (ServerRequestInterface $request, $next) {
-                return new JsonResponse(['activeLayers' => []]);
-            }, ['name' => 'main-page'])
-            ->use(function (ServerRequestInterface $request, RequestHandlerInterface $next) {
-                return $next->handle($request);
-            }, ['path' => '/not-active-layer', 'name' => 'bad-md'])
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 'otherwise']);
-            });
+            ->get('/', fn(ServerRequestInterface $request, $next) => new JsonResponse(['activeLayers' => []]),
+	            ['name' => 'main-page'])
+            ->use(fn(ServerRequestInterface $request, RequestHandlerInterface $next) => $next->handle($request),
+	            ['path' => '/not-active-layer', 'name' => 'bad-md'])
+            ->use(fn($request, $next) => new JsonResponse(['status' => 'otherwise']) );
 
         /** @var JsonResponse $response */
         $response = $this->router->handle($request);

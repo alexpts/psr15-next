@@ -92,7 +92,7 @@ class FromParamsTest extends TestCase
         static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
 
         $app = new Next;
-        $app->getStoreLayers()->addLayer($layer);
+        $app->getRouterStore()->addLayer($layer);
         $request = new ServerRequest([], [], '/');
         $response = $app->handle($request);
         static::assertSame('{"message":"staticAction"}', $response->getBody()->getContents());
@@ -110,7 +110,7 @@ class FromParamsTest extends TestCase
         static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
 
         $app = new Next;
-        $app->getStoreLayers()->addLayer($layer);
+        $app->getRouterStore()->addLayer($layer);
         $request = new ServerRequest([], [], '/');
         $response = $app->handle($request);
         static::assertSame('{"message":"action"}', $response->getBody()->getContents());
@@ -128,7 +128,7 @@ class FromParamsTest extends TestCase
         static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
 
         $app = new Next;
-        $app->getStoreLayers()->addLayer($layer);
+        $app->getRouterStore()->addLayer($layer);
         $request = new ServerRequest([], [], '/');
         $response = $app->handle($request);
         static::assertSame('{"message":"action"}', $response->getBody()->getContents());
@@ -146,7 +146,7 @@ class FromParamsTest extends TestCase
         static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
 
         $app = new Next;
-        $app->getStoreLayers()->addLayer($layer);
+        $app->getRouterStore()->addLayer($layer);
         $request = new ServerRequest([], [], '/');
         $response = $app->handle($request);
         static::assertSame('{"message":"invoke"}', $response->getBody()->getContents());

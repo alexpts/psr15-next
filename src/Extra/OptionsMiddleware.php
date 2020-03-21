@@ -9,8 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\Layer;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\StoreLayers;
 
 class OptionsMiddleware implements MiddlewareInterface
@@ -20,7 +20,7 @@ class OptionsMiddleware implements MiddlewareInterface
 
     public function __construct(Next $app)
     {
-        $this->store = $app->getStoreLayers();
+        $this->store = $app->getRouterStore();
         $this->resolver = $this->store->getResolver();
     }
 
@@ -69,6 +69,11 @@ class OptionsMiddleware implements MiddlewareInterface
      */
     protected function findActiveLayersWithoutHttpMethodCheck(ServerRequestInterface $request): array
     {
-        return $this->resolver->findActiveLayers($this->store->getLayers(), $request, false);
+	    $activeLayers = array_filter(
+		    $this->store->getLayers(),
+		    fn(Layer $layer) => $this->resolver->isActiveLayer($layer, $request, false)
+	    );
+
+	    return array_values($activeLayers);
     }
 }

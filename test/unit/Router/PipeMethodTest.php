@@ -22,10 +22,8 @@ class PipeMethodTest extends TestCase
     {
         $request = new ServerRequest([], [], '/profile', 'GET');
 
-        $this->app->getStoreLayers()
-            ->get('/user', function ($request, $next) {
-                return new JsonResponse(['status' => 'user']);
-            })
+        $this->app->getRouterStore()
+            ->get('/user', fn ($request, $next) => new JsonResponse(['status' => 'user']) )
             ->pipe([
                 function($request, RequestHandlerInterface $next) {
                     /** @var JsonResponse $response */
@@ -38,9 +36,8 @@ class PipeMethodTest extends TestCase
                     $body = array_merge($response->getPayload(), ['pipe2' => true]);
                     return new JsonResponse($body);
                 },
-            ], ['method' => ['GET'], 'path' => '/profile'])->use(function(){
-                return new JsonResponse(['status' => 404]);
-            }, ['name' => 'otherwise']);
+            ], ['method' => ['GET'], 'path' => '/profile'])
+	        ->use(fn() => new JsonResponse(['status' => 404]), ['name' => 'otherwise']);
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
@@ -52,10 +49,8 @@ class PipeMethodTest extends TestCase
     {
         $request = new ServerRequest([], [], '/profile', 'GET');
 
-        $this->app->getStoreLayers()
-            ->get('/user', function ($request, $next) {
-                return new JsonResponse(['status' => 'user']);
-            })
+        $this->app->getRouterStore()
+            ->get('/user', fn($request, $next) => new JsonResponse(['status' => 'user']))
             ->pipe([
                 function($request, RequestHandlerInterface $next) {
                     /** @var JsonResponse $response */
@@ -63,9 +58,7 @@ class PipeMethodTest extends TestCase
                     $body = array_merge($response->getPayload(), ['pipe1' => true]);
                     return new JsonResponse($body);
                 },
-                function($request, $next) {
-                    return new JsonResponse(['pipe2' => true]);
-                },
+                fn($request, $next) => new JsonResponse(['pipe2' => true]),
             ], ['method' => ['GET'], 'path' => '/profile']);
 
         /** @var JsonResponse $response */

@@ -19,10 +19,8 @@ class WithPriorityTest extends TestCase
 
     public function testPriorityLayers(): void
     {
-        $this->app->getStoreLayers()
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            });
+        $this->app->getRouterStore()
+            ->use(fn($request, $next) => new JsonResponse(['status' => 200]));
 
         $data = ['a' => 20, 'b' => 50, 'c' => 50, 'd' => 40, 'e' => 0];
         foreach ($data as $name => $priority) {
@@ -31,14 +29,12 @@ class WithPriorityTest extends TestCase
             }));
             $layer->name = $name;
             $layer->priority = $priority;
-            $this->app->getStoreLayers()->addLayer($layer);
+            $this->app->getRouterStore()->addLayer($layer);
         }
 
         /** @var JsonResponse $response */
-        $layers = $this->app->getStoreLayers()->getLayers();
-        $actual = array_map(function (Layer $layer) {
-            return $layer->name;
-        }, $layers);
+        $layers = $this->app->getRouterStore()->getLayers();
+        $actual = array_map(fn(Layer $layer) => $layer->name, $layers);
 
         $this->assertSame(['e', 'a', 'd', 'layer-0', 'b', 'c'], $actual);
     }

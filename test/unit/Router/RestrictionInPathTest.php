@@ -5,8 +5,8 @@ use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\CallableToMiddleware;
 use PTS\NextRouter\Layer;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 
 class RestrictionInPathTest extends TestCase
 {
@@ -33,11 +33,9 @@ class RestrictionInPathTest extends TestCase
 		$layer->restrictions = ['id' => '\d+'];
 		$layer->regexp = $resolver->makeRegExp($layer);
 
-        $this->app->getStoreLayers()
+        $this->app->getRouterStore()
             ->addLayer($layer)
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 'otherwise']);
-            });
+            ->use(fn($request, $next) => new JsonResponse(['status' => 'otherwise']));
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);

@@ -3,8 +3,8 @@
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 
 class HttpMethodTest extends TestCase
 {
@@ -22,17 +22,11 @@ class HttpMethodTest extends TestCase
     {
         $request = new ServerRequest([], [], '/');
 
-        $this->app->getStoreLayers()
+        $this->app->getRouterStore()
             // expected skip by http method
-            ->post('/', function ($request, $next) {
-                return new JsonResponse(['method' => 'post']);
-            })
-            ->patch('/', function ($request, $next) {
-                return new JsonResponse(['method' => 'patch']);
-            })
-            ->get('/', function ($request, $next) {
-                return new JsonResponse(['method' => 'get']);
-            });
+            ->post('/', fn($request, $next) => new JsonResponse(['method' => 'post']) )
+            ->patch('/', fn($request, $next) => new JsonResponse(['method' => 'patch']) )
+            ->get('/', fn($request, $next) => new JsonResponse(['method' => 'get']) );
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);

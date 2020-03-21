@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace PTS\NextRouter;
 
-use function count;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\NextRouter\Resolver\LayerResolverInterface;
+use function count;
 
 class StoreLayers
 {
@@ -14,7 +16,7 @@ class StoreLayers
 
     public const EVENT_ADD_LAYER = 'store.layers.add';
 
-    protected LayerResolver $resolver;
+    protected LayerResolverInterface $resolver;
     /** @var Layer[] */
     protected array $layers = [];
     protected int $autoincrement = 0;
@@ -23,7 +25,7 @@ class StoreLayers
 
     protected bool $sorted = false;
 
-    public function __construct(LayerResolver $resolver = null)
+    public function __construct(LayerResolverInterface $resolver = null)
     {
         $this->resolver = $resolver ?? new LayerResolver;
         $this->layerFactory = new LayerFactory;
@@ -106,12 +108,23 @@ class StoreLayers
      */
     public function getLayersForRequest(ServerRequestInterface $request): array
     {
-        return $this->resolver->findActiveLayers($this->getLayers(), $request);
+	    $activeLayers = array_filter(
+		    $this->getLayers(),
+		    fn(Layer $layer) => $this->resolver->isActiveLayer($layer, $request)
+	    );
+
+	    return array_values($activeLayers);
     }
 
     public function findLayerByName(string $name): ?Layer
     {
-        return $this->resolver->findLayerByName($this->getLayers(), $name);
+	    foreach ($this->getLayers() as $layer) {
+		    if ($layer->path && $layer->name === $name) {
+			    return $layer;
+		    }
+	    }
+
+	    return null;
     }
 
     /**
@@ -161,16 +174,14 @@ class StoreLayers
     }
 
     /**
-     * @param string|null $path
      * @param callable[] $handlers
      * @param array $options
      *
      * @return $this
      */
-    public function pipe(array $handlers, array $options = [], string $path = null)
+    public function pipe(array $handlers, array $options = [])
     {
         $layer = $this->layerFactory->pipe($handlers, array_merge([
-            'path' => $path,
             'type' => Layer::TYPE_ROUTE,
         ], $options));
 
@@ -185,7 +196,7 @@ class StoreLayers
 	protected function normalizerLayer(Layer $layer): Layer
 	{
 		$layer->path = $this->getFullPath($layer->path);
-		$layer->name = $layer->name ?? 'layer-'.$this->autoincrement;
+		$layer->name ??= 'layer-'.$this->autoincrement;
 		$layer->regexp = $this->resolver->makeRegExp($layer);
 		return $layer;
 	}

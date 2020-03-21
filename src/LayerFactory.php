@@ -7,15 +7,17 @@ use Psr\Http\Server\MiddlewareInterface;
 use PTS\NextRouter\Extra\EndPoint\DynamicPoint;
 use PTS\NextRouter\Extra\EndPoint\EndPoint;
 use PTS\NextRouter\Extra\PipeStack;
+use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\NextRouter\Resolver\LayerResolverInterface;
 
 class LayerFactory
 {
 
     protected LayerResolver $resolver;
 
-    public function __construct()
+    public function __construct(LayerResolverInterface $resolver = null)
 	{
-		$this->resolver = new LayerResolver;
+		$this->resolver = $resolver ?? new LayerResolver;
 	}
 
     public function callable(callable $handler, array $options = []): Layer

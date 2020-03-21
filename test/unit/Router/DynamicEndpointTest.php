@@ -18,7 +18,7 @@ class DynamicEndpointTest extends TestCase
     public function testEndPoint(): void
     {
         $request = new ServerRequest([], [], '/user-controller/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['prefix' => 'PTS\\NextRouter\\Controller\\'];
         $layer = $store->getLayerFactory()->dynamicEndPoint($endPoint, ['path' => '/{_controller}/']);
@@ -32,7 +32,7 @@ class DynamicEndpointTest extends TestCase
     public function testBadEndpointError(): void
     {
         $request = new ServerRequest([], [], '/user-controller/');
-        $store = $this->app->getStoreLayers();
+        $store = $this->app->getRouterStore();
 
         $endPoint = ['prefix' => 'PTS\\NextRouter\\Controller\\', 'nextOnError' => false];
         $layer = $store->getLayerFactory()->dynamicEndPoint($endPoint, ['path' => '/user-controller/']);

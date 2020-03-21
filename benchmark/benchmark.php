@@ -25,7 +25,7 @@ $startTime = microtime(true);
 
 $app = new Next;
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->use(function (ServerRequestInterface $request, $next) {
         /** @var ResponseInterface $response */
         $response = $next->handle($request);

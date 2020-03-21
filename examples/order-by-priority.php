@@ -4,14 +4,14 @@ declare(strict_types=1);
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 
 require_once '../vendor/autoload.php';
 
 $app = new Next(new LayerResolver);
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->use(function () {
         return new JsonResponse(['message' => 'otherwise']);
     }, ['priority' => 100]) // will run after route

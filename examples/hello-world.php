@@ -5,14 +5,14 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 
 require_once '../vendor/autoload.php';
 
 $app = new Next(new LayerResolver);
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->get('/users', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'Hello world'], 200);
     })

@@ -3,8 +3,8 @@
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 
 class MountTest extends TestCase
 {
@@ -23,13 +23,9 @@ class MountTest extends TestCase
         $request = new ServerRequest([], [], '/');
         $router2 = clone $this->app;
 
-        $router2->getStoreLayers()
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 401]);
-            }, ['path' => '/admin/.*'])
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            }, ['path' => '/']);
+        $router2->getRouterStore()
+            ->use(fn($request, $next) => new JsonResponse(['status' => 401]), ['path' => '/admin/.*'])
+            ->use(fn($request, $next) => new JsonResponse(['status' => 200]), ['path' => '/']);
 
         /** @var JsonResponse $response */
         $response = $this->app
@@ -44,13 +40,9 @@ class MountTest extends TestCase
         $request = new ServerRequest([], [], '/');
         $router2 = clone $this->app;
 
-        $router2->getStoreLayers()
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 401]);
-            }, ['path' => '/admin/.*'])
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            }, ['path' => '/']);
+        $router2->getRouterStore()
+            ->use(fn($request, $next) => new JsonResponse(['status' => 401]), ['path' => '/admin/.*'])
+            ->use(fn ($request, $next) => new JsonResponse(['status' => 200]), ['path' => '/']);
 
         /** @var JsonResponse $response */
         $response = $this->app

@@ -29,7 +29,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\NextRouter\LayerResolver;
+use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\Next;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
 
@@ -37,7 +37,7 @@ require_once '../vendor/autoload.php';
 
 $app = new Next;
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->middleware(new ErrorToJsonResponse(true))
     ->get('/hello', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'Hello world'], 200);

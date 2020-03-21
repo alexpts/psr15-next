@@ -12,19 +12,19 @@ require_once '../vendor/autoload.php';
 $apiV1 = new Next;
 $apiV2 = new Next;
 
-$apiV2->getStoreLayers()
+$apiV2->getRouterStore()
     ->get('/users/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'api users']);
     });
 
-$apiV1->getStoreLayers()
+$apiV1->getRouterStore()
     ->get('/', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'app']);
     });
 
 $apiV1->mount($apiV2, '/api');
 
-$apiV1->getStoreLayers()
+$apiV1->getRouterStore()
     ->use(function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'otherwise']);
     });

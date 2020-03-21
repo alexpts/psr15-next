@@ -17,7 +17,7 @@ class UrlCreator
 
     public function url(string $name, array $placeholders = [], array $options = []): ?string
     {
-        $layer = $this->app->getStoreLayers()->findLayerByName($name);
+        $layer = $this->app->getRouterStore()->findLayerByName($name);
         return $layer ? $this->create($layer, $placeholders, $options) : null;
     }
 

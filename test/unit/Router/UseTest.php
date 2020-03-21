@@ -4,8 +4,8 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use PTS\NextRouter\LayerResolver;
 use PTS\NextRouter\Next;
+use PTS\NextRouter\Resolver\LayerResolver;
 
 class UseTest extends TestCase
 {
@@ -23,10 +23,8 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest;
 
-        $this->app->getStoreLayers()
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 200]);
-            });
+        $this->app->getRouterStore()
+            ->use(fn($request, $next) => new JsonResponse(['status' => 200]) );
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
@@ -38,13 +36,9 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest();
 
-        $this->app->getStoreLayers()
-            ->use(function ($request, RequestHandlerInterface $next) {
-                return $next->handle($request);
-            })
-            ->use(function ($request, $next) {
-                return new JsonResponse(['status' => 202]);
-            });
+        $this->app->getRouterStore()
+            ->use(fn($request, RequestHandlerInterface $next) => $next->handle($request) )
+            ->use(fn ($request, $next) => new JsonResponse(['status' => 202]) );
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
@@ -56,13 +50,9 @@ class UseTest extends TestCase
     {
         $request = new ServerRequest();
 
-        $this->app->getStoreLayers()
-            ->use(function ($request, $next) {
-                return new JsonResponse(['name' => 'A']);
-            }, ['path' => '/blog'])
-            ->use(function ($request, $next) {
-                return new JsonResponse(['name' => 'B']);
-            });
+        $this->app->getRouterStore()
+            ->use(fn ($request, $next) => new JsonResponse(['name' => 'A']), ['path' => '/blog'])
+            ->use(fn ($request, $next) => new JsonResponse(['name' => 'B']));
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);

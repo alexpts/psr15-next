@@ -27,7 +27,7 @@ $handler = [
     },
 ];
 
-$app->getStoreLayers()
+$app->getRouterStore()
     ->pipe($handler, ['path' => '/users', 'method' => ['GET']])
     ->use(function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'otherwise']);
