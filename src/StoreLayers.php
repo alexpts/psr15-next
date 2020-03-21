@@ -12,9 +12,6 @@ use function count;
 class StoreLayers
 {
     use FastMethods;
-    use EmitterTrait;
-
-    public const EVENT_ADD_LAYER = 'store.layers.add';
 
     protected LayerResolverInterface $resolver;
     /** @var Layer[] */
@@ -55,7 +52,6 @@ class StoreLayers
     public function addLayer(Layer $layer)
     {
         $this->layers[] = $this->normalizerLayer($layer);
-        $this->emit(self::EVENT_ADD_LAYER, [$layer, $this]);
 
         $this->autoincrement++;
         $this->sorted = false;

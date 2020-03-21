@@ -21,10 +21,10 @@ class Next implements RequestHandlerInterface
     protected StoreLayers $store;
     protected Runner $runner;
 
-    public function __construct(LayerResolverInterface $resolver = null)
+    public function __construct(LayerResolverInterface $resolver = null, StoreLayers $routerStore = null)
     {
         $resolver ??= new LayerResolver;
-        $this->store = new StoreLayers($resolver);
+        $this->store = $routerStore ?? new StoreLayers($resolver);
         $this->runner = new Runner;
     }
 
@@ -42,7 +42,6 @@ class Next implements RequestHandlerInterface
     {
         $this->events = $events;
         $this->runner->setEvents($events);
-        $this->store->setEvents($events);
         return $this;
     }
 
