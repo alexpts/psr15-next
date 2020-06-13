@@ -6,10 +6,9 @@ use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use PTS\NextRouter\CallableToMiddleware;
-use PTS\NextRouter\Extra\EndPoint\DynamicPoint;
-use PTS\NextRouter\Extra\EndPoint\EndPoint;
+use PTS\NextRouter\Factory\LayerFactory;
 use PTS\NextRouter\Layer;
-use PTS\NextRouter\LayerFactory;
+use PTS\NextRouter\Middleware\LazyCallableToMiddleware;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\RouterException;
 
@@ -56,30 +55,6 @@ class FromParamsTest extends TestCase
         static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
     }
 
-    public function testCreateEndpoint(): void
-    {
-        $factory = new LayerFactory;
-        $config = [
-            'path' => '/users/{id}',
-            'endpoint' => [],
-        ];
-
-        $layer = $factory->create($config);
-        static::assertInstanceOf(EndPoint::class, $layer->md);
-    }
-
-    public function testCreateDynamicPoint(): void
-    {
-        $factory = new LayerFactory;
-        $config = [
-            'path' => '/users/{id}',
-            'dynamicPoint' => [],
-        ];
-
-        $layer = $factory->create($config);
-        static::assertInstanceOf(DynamicPoint::class, $layer->md);
-    }
-
     public function testCreateStaticMethod(): void
     {
         $factory = new LayerFactory;
@@ -103,29 +78,11 @@ class FromParamsTest extends TestCase
         $factory = new LayerFactory;
         $config = [
             'path' => '/',
-            'callable' => ['FromParamsTest', 'action'],
+            'lazy-callable' => ['FromParamsTest', 'action'],
         ];
 
         $layer = $factory->create($config);
-        static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
-
-        $app = new Next;
-        $app->getRouterStore()->addLayer($layer);
-        $request = new ServerRequest([], [], '/');
-        $response = $app->handle($request);
-        static::assertSame('{"message":"action"}', $response->getBody()->getContents());
-    }
-
-    public function testCreateFromSymfonyFormatMethod(): void
-    {
-        $factory = new LayerFactory;
-        $config = [
-            'path' => '/',
-            'callable' => 'FromParamsTest:action',
-        ];
-
-        $layer = $factory->create($config);
-        static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
+        static::assertInstanceOf(LazyCallableToMiddleware::class, $layer->md);
 
         $app = new Next;
         $app->getRouterStore()->addLayer($layer);
@@ -139,11 +96,11 @@ class FromParamsTest extends TestCase
         $factory = new LayerFactory;
         $config = [
             'path' => '/',
-            'callable' => 'FromParamsTest',
+            'lazy-callable' => ['FromParamsTest'],
         ];
 
         $layer = $factory->create($config);
-        static::assertInstanceOf(CallableToMiddleware::class, $layer->md);
+        static::assertInstanceOf(LazyCallableToMiddleware::class, $layer->md);
 
         $app = new Next;
         $app->getRouterStore()->addLayer($layer);

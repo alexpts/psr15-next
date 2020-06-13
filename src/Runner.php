@@ -5,9 +5,7 @@ namespace PTS\NextRouter;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use PTS\NextRouter\Extra\PipeStack;
 
 class Runner implements RequestHandlerInterface
 {
@@ -26,46 +24,26 @@ class Runner implements RequestHandlerInterface
         $this->layers = $activeLayers;
     }
 
-    /**
-     * @inheritdoc
-     */
+    public function getLayers(): array
+    {
+    	return $this->layers;
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $middleware = $this->getNextMiddleware();
-        $request = $this->withParams($request);
+        $layer = $this->getCurrentLayer();
 
-		$this->emit(self::EVENT_BEFORE_NEXT, [$request, $this]);
+		$this->emit(self::EVENT_BEFORE_NEXT, [$request, $this, $layer]);
         $this->index++;
 
         try {
-            $response = $middleware->process($request, $this);
+            $response = $layer->md->process($request, $this);
         } finally {
             $this->index--;
         }
 
 		$this->emit(self::EVENT_AFTER_NEXT, [$request, $this, $response]);
         return $response;
-    }
-
-    protected function withParams(ServerRequestInterface $request): ServerRequestInterface
-    {
-        $layer = $this->getCurrentLayer();
-        if ($layer->matches) {
-            $old = $request->getAttribute('params', []);
-            $request = $request->withAttribute('params', array_merge($old, $layer->matches));
-        }
-
-        return $request->withAttribute('router.current.layer', $layer);
-    }
-
-    protected function getNextMiddleware(): MiddlewareInterface
-    {
-        $middleware = $this->layers[$this->index]->md;
-        if ($middleware instanceof PipeStack) {
-            $middleware->setNext($this);
-        }
-
-        return $middleware;
     }
 
     public function getCurrentLayer(): Layer

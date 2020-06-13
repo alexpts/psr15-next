@@ -29,8 +29,7 @@ class LayerResolver implements LayerResolverInterface
 
     protected function filterIsAllowMethod(Layer $layer, RequestInterface $request): bool
     {
-	    $allows = $layer->methods;
-	    return count($allows) ? in_array($request->getMethod(), $allows, true) : true;
+	    return count($layer->methods) ? in_array($request->getMethod(), $layer->methods, true) : true;
     }
 
     protected function matchRegexpLayer(Layer $layer, RequestInterface $request): ?Layer
@@ -54,9 +53,9 @@ class LayerResolver implements LayerResolverInterface
             return false;
         }
 
-        if ($layer->path === null) {
-            return true;
-        }
+	    if ($layer->path === null) {
+		    return true;
+	    }
 
         return null !== $this->matchRegexpLayer($layer, $request);
     }

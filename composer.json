@@ -30,12 +30,11 @@
         "alexpts/php-simple-events": "^4.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0",
+        "phpunit/phpunit": "^9.2",
         "alexpts/psr15-middlewares": "^1.16",
-        "blackfire/php-sdk": "^1.22",
-        "nyholm/psr7": "^1.2",
-        "nyholm/psr7-server": "^0.4.1",
-        "laminas/laminas-diactoros": "^2.2"
+        "blackfire/php-sdk": "^1.23",
+        "alexpts/mutable-psr7": "^0.0.2",
+        "laminas/laminas-diactoros": "^2.3"
     },
     "autoload": {
         "psr-4": {

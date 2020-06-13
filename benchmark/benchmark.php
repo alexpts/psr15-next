@@ -2,12 +2,11 @@
 
 use Blackfire\Client;
 use Blackfire\Profile\Configuration;
-use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7\Response;
-use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\Next;
+use PTS\Psr7\Factory\Psr17Factory;
+use PTS\Psr7\Response;
 
 require_once __DIR__  .'/../vendor/autoload.php';
 
@@ -22,27 +21,25 @@ if ($blackfire) {
 
 $startTime = microtime(true);
 
-
 $app = new Next;
+$response404 = new Response(200, ['content-type' => 'application/json'], json_encode(['message' => 'otherwise']));
 
 $app->getRouterStore()
     ->use(function (ServerRequestInterface $request, $next) {
         /** @var ResponseInterface $response */
         $response = $next->handle($request);
-        return $response->withHeader('x-header', 12);
+        return $response->withHeader('x-header', 1);
     })
     ->get('/users', function (ServerRequestInterface $request, $next) {
         return new Response(200, ['content-type' => 'application/json'], json_encode(['message' => 'hello']));
     })
-    ->use(function (ServerRequestInterface $request, $next) {
-        return new Response(200, ['content-type' => 'application/json'], json_encode(['message' => 'otherwise']));
+    ->use(function (ServerRequestInterface $request, $next) use ($response404) {
+        return clone $response404;
     });
 
 $psr17Factory = new Psr17Factory;
-$creator = new ServerRequestCreator($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
-
 while ($iterations--) {
-    $request = $creator->fromGlobals();
+	$request = $psr17Factory->createServerRequest('GET', '/user');
     $response = $app->handle($request);
 }
 

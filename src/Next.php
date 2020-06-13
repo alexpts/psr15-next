@@ -84,7 +84,7 @@ class Next implements RequestHandlerInterface
         $allowLayers = $this->store->getLayersForRequest($request);
         $this->runner->setLayers($allowLayers);
 
-        $this->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers]);
+        $this->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers, $this->runner]);
         $response = $this->runner->handle($request);
 		$this->emit(self::EVENT_AFTER_HANDLE, [$request, $allowLayers, $response]);
 
