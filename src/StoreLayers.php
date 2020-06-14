@@ -107,15 +107,14 @@ class StoreLayers
 	 */
 	public function getLayersForRequest(ServerRequestInterface $request): array
 	{
-
-		$active = [];
+		$activeLayers = [];
 		foreach ($this->getLayers() as $i => $layer) {
 			if ($this->resolver->isActiveLayer($layer, $request)) {
-				$active[] = $layer;
+				$activeLayers[] = $layer;
 			}
 		}
 
-		return $active;
+		return $activeLayers;
 	}
 
 	public function findLayerByName(string $name): ?Layer
