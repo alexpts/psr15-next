@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use PTS\NextRouter\CallableToMiddleware;
@@ -11,6 +9,9 @@ use PTS\NextRouter\Layer;
 use PTS\NextRouter\Middleware\LazyCallableToMiddleware;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\RouterException;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class FromParamsTest extends TestCase
 {
@@ -68,9 +69,9 @@ class FromParamsTest extends TestCase
 
         $app = new Next;
         $app->getRouterStore()->addLayer($layer);
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
         $response = $app->handle($request);
-        static::assertSame('{"message":"staticAction"}', $response->getBody()->getContents());
+        static::assertSame('{"message":"staticAction"}', (string)$response->getBody());
     }
 
     public function testCreateFromMethod(): void
@@ -86,9 +87,9 @@ class FromParamsTest extends TestCase
 
         $app = new Next;
         $app->getRouterStore()->addLayer($layer);
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
         $response = $app->handle($request);
-        static::assertSame('{"message":"action"}', $response->getBody()->getContents());
+        static::assertSame('{"message":"action"}', (string)$response->getBody());
     }
 
     public function testCreateFromObject(): void
@@ -104,9 +105,9 @@ class FromParamsTest extends TestCase
 
         $app = new Next;
         $app->getRouterStore()->addLayer($layer);
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
         $response = $app->handle($request);
-        static::assertSame('{"message":"invoke"}', $response->getBody()->getContents());
+        static::assertSame('{"message":"invoke"}', (string)$response->getBody());
     }
 
     public function testCreateUnknown(): void

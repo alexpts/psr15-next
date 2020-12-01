@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class HttpMethodTest extends TestCase
 {
@@ -14,13 +16,12 @@ class HttpMethodTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->app = new Next(new LayerResolver);
     }
 
     public function testSimple(): void
     {
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
 
         $this->app->getRouterStore()
             // expected skip by http method
@@ -30,7 +31,6 @@ class HttpMethodTest extends TestCase
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
-
-        $this->assertSame(['method' => 'get'], $response->getPayload());
+        static::assertSame(['method' => 'get'], $response->getData());
     }
 }

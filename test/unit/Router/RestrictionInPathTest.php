@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\CallableToMiddleware;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class RestrictionInPathTest extends TestCase
 {
@@ -22,16 +24,17 @@ class RestrictionInPathTest extends TestCase
 
     public function testSimple(): void
     {
-    	$resolver = new LayerResolver;
+        $resolver = new LayerResolver;
 
-    	$request = new ServerRequest([], [], '/users/alex/');
-        $request2 = new ServerRequest([], [], '/users/5/');
+        $request = new ServerRequest('GET', new Uri('/users/alex/'));
+        $request2 = new ServerRequest('GET', new Uri('/users/5/'));
 
-        $layer = new Layer('/users/{id}/', new CallableToMiddleware(function ($request, $next) {
-            return new JsonResponse(['status' => 'user route']);
-        }));
-		$layer->restrictions = ['id' => '\d+'];
-		$layer->regexp = $resolver->makeRegExp($layer);
+        $layer = new Layer(
+            '/users/{id}/',
+            new CallableToMiddleware(fn() => new JsonResponse(['status' => 'user route'])
+        ));
+        $layer->restrictions = ['id' => '\d+'];
+        $layer->regexp = $resolver->makeRegExp($layer);
 
         $this->app->getRouterStore()
             ->addLayer($layer)
@@ -42,7 +45,7 @@ class RestrictionInPathTest extends TestCase
         /** @var JsonResponse $response2 */
         $response2 = $this->app->handle($request2);
 
-        $this->assertSame(['status' => 'otherwise'], $response->getPayload());
-        $this->assertSame(['status' => 'user route'], $response2->getPayload());
+        static::assertSame(['status' => 'otherwise'], $response->getData());
+        static::assertSame(['status' => 'user route'], $response2->getData());
     }
 }

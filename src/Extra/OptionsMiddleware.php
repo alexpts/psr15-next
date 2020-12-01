@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace PTS\NextRouter\Extra;
 
-use Laminas\Diactoros\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -12,6 +11,7 @@ use PTS\NextRouter\Layer;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\StoreLayers;
+use PTS\Psr7\Response;
 
 class OptionsMiddleware implements MiddlewareInterface
 {
@@ -46,7 +46,7 @@ class OptionsMiddleware implements MiddlewareInterface
     protected function getSupportMethods($request): array
     {
         $activeLayers = $this->findActiveLayersWithoutHttpMethodCheck($request);
-        $supportMethods = array_reduce($activeLayers, function(array $acc, Layer $layer) {
+        $supportMethods = array_reduce($activeLayers, static function(array $acc, Layer $layer) {
             if ($layer->type === Layer::TYPE_ROUTE && $layer->methods) {
                 array_push($acc, ...$layer->methods);
             }

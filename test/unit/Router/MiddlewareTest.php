@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\CallableToMiddleware;
 use PTS\NextRouter\Next;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class MiddlewareTest extends TestCase
 {
@@ -16,13 +18,12 @@ class MiddlewareTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->app = new Next;
     }
 
     public function testSimple(): void
     {
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
 
         $next = function (ServerRequestInterface $request, RequestHandlerInterface $next) {
             return $next->handle($request);
@@ -38,57 +39,51 @@ class MiddlewareTest extends TestCase
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
 
-        $this->assertSame(['status' => 200], $response->getPayload());
+        static::assertSame(['status' => 200], $response->getData());
     }
 
     public function testSimple2(): void
     {
-        $request = new ServerRequest([], [], '/main');
+        $request = new ServerRequest('GET', new Uri('/main'));
 
         $this->app->getRouterStore()
-            ->get('/', function ($request, $next) {
-                throw new \Exception('must skip');
-            })
+            ->get('/', fn($request, $next) => throw new Exception('must skip'))
             ->get('/main', fn($request, $next) => new JsonResponse(['status' => 'main']));
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
-
-        $this->assertSame(['status' => 'main'], $response->getPayload());
+        static::assertSame(['status' => 'main'], $response->getData());
     }
 
     public function testFallback(): void
     {
-        $request = new ServerRequest([], [], '/otherwise');
+        $request = new ServerRequest('GET', new Uri('/otherwise'));
 
         $this->app->getRouterStore()
-            ->get('/', function ($request, $next) {
-                throw new \Exception('must skip');
-            })
+            ->get('/', fn($request, $next) => throw new Exception('must skip'))
             ->get('/main', fn($request, $next) => new JsonResponse(['status' => 'main']) )
             ->use(fn($request, $next) => new JsonResponse(['status' => 'otherwise']) );
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
-
-        $this->assertSame(['status' => 'otherwise'], $response->getPayload());
+        static::assertSame(['status' => 'otherwise'], $response->getData());
     }
 
     public function testWithPrefix(): void
     {
-        $request = new ServerRequest([], [], '/admins/dashboard');
+        $request = new ServerRequest('GET', new Uri('/admins/dashboard'));
         $router = new Next;
 
         $router->getRouterStore()
             ->setPrefix('/admins')
             ->get('/admins/dashboard', function ($request, $next) { // /admins/admins/dashboard
-                throw new \Exception('must skip');
+                throw new Exception('must skip');
             })
             ->get('/dashboard', fn($request, $next) => new JsonResponse(['status' => 'dashboard']) );
 
         /** @var JsonResponse $response */
         $response = $router->handle($request);
 
-        $this->assertSame(['status' => 'dashboard'], $response->getPayload());
+        static::assertSame(['status' => 'dashboard'], $response->getData());
     }
 }

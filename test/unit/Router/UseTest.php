@@ -1,11 +1,13 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class UseTest extends TestCase
 {
@@ -21,20 +23,19 @@ class UseTest extends TestCase
 
     public function testMethod(): void
     {
-        $request = new ServerRequest;
+        $request = new ServerRequest('GET', new Uri('/'));
 
-        $this->app->getRouterStore()
-            ->use(fn($request, $next) => new JsonResponse(['status' => 200]) );
+        $this->app->getRouterStore()->use(fn($request, $next) => new JsonResponse(['status' => 200]) );
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
 
-        $this->assertSame(['status' => 200], $response->getPayload());
+        static::assertSame(['status' => 200], $response->getData());
     }
 
     public function testChainMiddlewares(): void
     {
-        $request = new ServerRequest();
+        $request = new ServerRequest('GET', new Uri('/'));
 
         $this->app->getRouterStore()
             ->use(fn($request, RequestHandlerInterface $next) => $next->handle($request) )
@@ -42,13 +43,12 @@ class UseTest extends TestCase
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
-
-        $this->assertSame(['status' => 202], $response->getPayload());
+        static::assertSame(['status' => 202], $response->getData());
     }
 
     public function testPathMiddlewares(): void
     {
-        $request = new ServerRequest();
+        $request = new ServerRequest('GET', new Uri('/'));
 
         $this->app->getRouterStore()
             ->use(fn ($request, $next) => new JsonResponse(['name' => 'A']), ['path' => '/blog'])
@@ -56,7 +56,6 @@ class UseTest extends TestCase
 
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
-
-        $this->assertSame(['name' => 'B'], $response->getPayload());
+        static::assertSame(['name' => 'B'], $response->getData());
     }
 }

@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\CallableToMiddleware;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\Next;
+use PTS\Psr7\Response\JsonResponse;
 
 class WithPriorityTest extends TestCase
 {
@@ -36,6 +37,6 @@ class WithPriorityTest extends TestCase
         $layers = $this->app->getRouterStore()->getLayers();
         $actual = array_map(fn(Layer $layer) => $layer->name, $layers);
 
-        $this->assertSame(['e', 'a', 'd', 'layer-0', 'b', 'c'], $actual);
+        static::assertSame(['e', 'a', 'd', 'layer-0', 'b', 'c'], $actual);
     }
 }

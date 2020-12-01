@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Extra\UrlCreator;
 use PTS\NextRouter\Next;
+use PTS\Psr7\Response\JsonResponse;
 
 class UrlTest extends TestCase
 {
@@ -27,7 +28,7 @@ class UrlTest extends TestCase
         $query = ['format' => 'json', 'rel' => 'site'];
         $path = $this->urlCreator->url('user', ['id' => 34], ['query' => $query]);
         $expected = '/users/34/?format=json&rel=site';
-        $this->assertSame($expected, $path);
+        static::assertSame($expected, $path);
     }
 
 }

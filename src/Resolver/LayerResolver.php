@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace PTS\NextRouter\Resolver;
 
@@ -14,6 +15,10 @@ class LayerResolver implements LayerResolverInterface
     {
         $regexp = $layer->path;
         $placeholders = [];
+
+        if ($regexp === null) {
+            return null;
+        }
 
         if (preg_match_all('~{(.*)}~Uu', $regexp, $placeholders)) {
             foreach ($placeholders[0] as $index => $match) {

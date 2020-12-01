@@ -6,14 +6,15 @@ namespace PTS\NextRouter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use PTS\Events\EventsInterface;
+use PTS\Events\EventBusTrait;
+use PTS\Events\EventEmitterInterface;
 use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\Resolver\LayerResolverInterface;
 use Throwable;
 
 class Next implements RequestHandlerInterface
 {
-	use EmitterTrait;
+    use EventBusTrait;
 
     public const EVENT_BEFORE_HANDLE = 'app.before.handle';
     public const EVENT_AFTER_HANDLE = 'app.after.handle';
@@ -34,11 +35,11 @@ class Next implements RequestHandlerInterface
     }
 
     /**
-     * @param EventsInterface $events
+     * @param EventEmitterInterface $events
      *
      * @return $this
      */
-    public function setEvents(EventsInterface $events)
+    public function setEvents(EventEmitterInterface $events): static
     {
         $this->events = $events;
         $this->runner->setEvents($events);
@@ -58,7 +59,7 @@ class Next implements RequestHandlerInterface
      *
      * @return $this
      */
-    public function mount(Next $app, string $path = null)
+    public function mount(Next $app, string $path = null): static
     {
         foreach ($app->store->getLayers() as $layer) {
             if (null === $path) {
@@ -67,27 +68,26 @@ class Next implements RequestHandlerInterface
             }
 
             $clone = clone $layer;
-            $clone->path = !$layer->path ? $path.'/.*' : $path.$layer->path;
+            $clone->path = !$layer->path ? $path . '/.*' : $path . $layer->path;
             $this->store->addLayer($clone);
         }
 
         return $this;
     }
 
-	/**
-	 * @inheritdoc
-	 *
-	 * @throws Throwable
-	 */
-	public function handle(ServerRequestInterface $request): ResponseInterface
+    /**
+     * @inheritdoc
+     * @throws Throwable
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $allowLayers = $this->store->getLayersForRequest($request);
         $this->runner->setLayers($allowLayers);
 
         $this->emit(self::EVENT_BEFORE_HANDLE, [$request, $allowLayers, $this->runner]);
         $response = $this->runner->handle($request);
-		$this->emit(self::EVENT_AFTER_HANDLE, [$request, $allowLayers, $response]);
+        $this->emit(self::EVENT_AFTER_HANDLE, [$request, $allowLayers, $response]);
 
-		return $response;
+        return $response;
     }
 }

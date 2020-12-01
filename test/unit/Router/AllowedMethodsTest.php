@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
-use PTS\Events\Events;
+use PTS\Events\EventEmitter;
 use PTS\NextRouter\Extra\OptionsMiddleware;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class AllowedMethodsTest extends TestCase
 {
@@ -19,12 +21,12 @@ class AllowedMethodsTest extends TestCase
         parent::setUp();
 
         $this->app = new Next;
-        $this->app->setEvents(new Events);
+        $this->app->setEvents(new EventEmitter);
     }
 
     public function testSimple(): void
     {
-        $request = new ServerRequest([], [], '/user', 'OPTIONS');
+        $request = new ServerRequest('OPTIONS', new Uri('/user'));
 
         $this->app->getRouterStore()
             ->get('/user', fn($request, $next) => new JsonResponse(['status' => 200]) )
@@ -33,13 +35,13 @@ class AllowedMethodsTest extends TestCase
 
         $response = $this->app->handle($request);
 
-        $this->assertTrue($response->hasHeader('Access-Control-Allow-Methods'));
-        $this->assertSame('GET, DELETE, OPTIONS', $response->getHeaderLine('Access-Control-Allow-Methods'));
+        static::assertTrue($response->hasHeader('Access-Control-Allow-Methods'));
+        static::assertSame('GET, DELETE, OPTIONS', $response->getHeaderLine('Access-Control-Allow-Methods'));
     }
 
     public function testUnknownPath(): void
     {
-        $request = new ServerRequest([], [], '/user', 'OPTIONS');
+        $request = new ServerRequest('OPTIONS', new Uri('/user'));
 
         $this->app->getRouterStore()
             ->get('/not-user', fn($request, $next) => new JsonResponse(['status' => 200]) )
@@ -50,6 +52,6 @@ class AllowedMethodsTest extends TestCase
         /** @var JsonResponse $response */
         $response = $this->app->handle($request);
 
-        $this->assertSame(404, $response->getPayload()['status']);
+        static::assertSame(404, $response->getData()['status']);
     }
 }

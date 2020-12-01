@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequest;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\Psr7\Response\JsonResponse;
+use PTS\Psr7\ServerRequest;
+use PTS\Psr7\Uri;
 
 class MountTest extends TestCase
 {
@@ -14,13 +16,12 @@ class MountTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->app = new Next(new LayerResolver);
     }
 
     public function testMount(): void
     {
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
         $router2 = clone $this->app;
 
         $router2->getRouterStore()
@@ -32,12 +33,12 @@ class MountTest extends TestCase
             ->mount($router2, '/api')
             ->handle($request);
 
-        $this->assertSame(['status' => 200], $response->getPayload());
+        static::assertSame(['status' => 200], $response->getData());
     }
 
     public function testMountWithoutPath(): void
     {
-        $request = new ServerRequest([], [], '/');
+        $request = new ServerRequest('GET', new Uri('/'));
         $router2 = clone $this->app;
 
         $router2->getRouterStore()
@@ -49,6 +50,6 @@ class MountTest extends TestCase
             ->mount($router2)
             ->handle($request);
 
-        $this->assertSame(['status' => 200], $response->getPayload());
+        static::assertSame(['status' => 200], $response->getData());
     }
 }
