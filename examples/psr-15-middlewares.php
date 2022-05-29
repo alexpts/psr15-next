@@ -1,20 +1,21 @@
 <?php
 declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\ParserPsr7\SapiEmitter;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
+use PTS\Psr7\Factory\Psr17Factory;
+use PTS\Psr7\Response\JsonResponse;
 
 require_once '../vendor/autoload.php';
 
+$psr17Factory = new Psr17Factory;
 $app = new Next(new LayerResolver);
 
 $app->getRouterStore()
-    ->middleware(new ErrorToJsonResponse(true), '/api/.*') // middelware active only /api/* path
+    ->middleware(new ErrorToJsonResponse(500,true), ['path' => '/api/.*']) // middleware active only /api/* path
     ->get('/api/users/', function (ServerRequestInterface $request, $next) {
         throw new Exception('Exception text - will convert to json response');
     })
@@ -25,7 +26,7 @@ $app->getRouterStore()
         return new JsonResponse(['message' => 'otherwise']);
     });
 
-$request = ServerRequestFactory::fromGlobals();
+$request = $psr17Factory->fromGlobals();
 $response = $app->handle($request);
 (new SapiEmitter)->emit($response);
 

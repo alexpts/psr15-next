@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
+use PTS\ParserPsr7\SapiEmitter;
+use PTS\Psr7\Factory\Psr17Factory;
+use PTS\Psr7\Response\JsonResponse;
 
 require_once '../vendor/autoload.php';
 
+$psr17Factory = new Psr17Factory;
 $app = new Next(new LayerResolver);
 
 $app->getRouterStore()
@@ -19,7 +20,7 @@ $app->getRouterStore()
         return new JsonResponse(['message' => 'handler']);
     }); // default priority = 50
 
-$request = ServerRequestFactory::fromGlobals();
+$request = $psr17Factory->fromGlobals();
 $response = $app->handle($request);
 (new SapiEmitter)->emit($response);
 

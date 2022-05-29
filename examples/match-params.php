@@ -1,25 +1,29 @@
 <?php
 declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
-use PTS\Events\Events;
+
+use PTS\Events\EventEmitter;
 use PTS\NextRouter\Next;
 use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\Runner;
+use PTS\ParserPsr7\SapiEmitter;
+use PTS\Psr7\Factory\Psr17Factory;
+use PTS\Psr7\Response\JsonResponse;
 
 require_once '../vendor/autoload.php';
 
+$psr17Factory = new Psr17Factory;
+
 $layerResolver = new LayerResolver;
-$events = new Events;
+$events = new EventEmitter;
 
 $events->on(Runner::EVENT_BEFORE_NEXT, function (ServerRequestInterface $request, Runner $runner){
     $request->withAttribute('my-params', $runner->getCurrentLayer()->matches);
 });
 
 $app = new Next($layerResolver);
+$app->setEvents($events);
 
 $app->getRouterStore()
     ->get('/', fn(ServerRequestInterface $request, $next) => new JsonResponse(['message' => 'app']))
@@ -29,7 +33,6 @@ $app->getRouterStore()
     })
     ->use(fn(ServerRequestInterface $request, $next) => new JsonResponse(['message' => 'otherwise']));
 
-$request = ServerRequestFactory::fromGlobals(); // /api/users/34/
+$request = $psr17Factory->fromGlobals(); // /api/users/34/
 $response = $app->handle($request);
 (new SapiEmitter)->emit($response);
-
