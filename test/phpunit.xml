@@ -12,13 +12,12 @@
         </testsuite>
     </testsuites>
 
-    <logging>
-        <log type="coverage-clover" target="clover.xml"/>
-    </logging>
-
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <coverage processUncoveredFiles="true">
+        <include>
             <directory suffix=".php">../src/</directory>
-        </whitelist>
-    </filter>
+        </include>
+        <report>
+            <clover outputFile="clover.xml"/>
+        </report>
+    </coverage>
 </phpunit>

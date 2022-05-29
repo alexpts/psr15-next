@@ -1,9 +1,7 @@
 # Next
 
-[![Build Status](https://travis-ci.org/alexpts/psr15-next.svg?branch=master)](https://travis-ci.org/alexpts/psr15-next)
-[![Code Coverage](https://scrutinizer-ci.com/g/alexpts/psr15-next/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/alexpts/psr15-next/?branch=master)
-[![Code Climate](https://codeclimate.com/github/alexpts/psr15-next/badges/gpa.svg)](https://codeclimate.com/github/alexpts/psr15-next)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alexpts/psr15-next/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alexpts/psr15-next/?branch=master)
+[![phpunit](https://github.com/alexpts/psr15-next/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/alexpts/psr15-next/actions/workflows/phpunit.yml)
+[![codecov](https://codecov.io/gh/alexpts/psr15-next/branch/master/graph/badge.svg?token=14L6IJA5UE)](https://codecov.io/gh/alexpts/psr15-next)
 
 
 Runner for PSR-15 middlewares.
