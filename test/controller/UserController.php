@@ -1,10 +1,10 @@
 <?php
 namespace PTS\NextRouter\Controller;
 
-use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use PTS\Psr7\Response\JsonResponse;
 
 class UserController
 {

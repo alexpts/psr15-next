@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
-use Laminas\Diactoros\Response\JsonResponse;
 use PHPUnit\Framework\TestCase;
 use PTS\NextRouter\Layer;
 use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\StoreLayers;
+use PTS\Psr7\Response\JsonResponse;
 
 class GetLastLayerTest extends TestCase
 {

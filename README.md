@@ -23,20 +23,20 @@ Runner for PSR-15 middlewares.
 
 ```php
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\Http\Message\ServerRequestInterface;
 use PTS\NextRouter\Resolver\LayerResolver;
 use PTS\NextRouter\Next;
 use PTS\PSR15\Middlewares\ErrorToJsonResponse;
+use PTS\ParserPsr7\SapiEmitter;
+use PTS\Psr7\Factory\Psr17Factory;
+use PTS\Psr7\Response\JsonResponse;
 
 require_once '../vendor/autoload.php';
 
+$psr17Factory = new Psr17Factory;
 $app = new Next;
 
 $app->getRouterStore()
-    ->middleware(new ErrorToJsonResponse(true))
     ->get('/hello', function (ServerRequestInterface $request, $next) {
         return new JsonResponse(['message' => 'Hello world'], 200);
     })
@@ -44,7 +44,7 @@ $app->getRouterStore()
         return new JsonResponse(['message' => 'otherwise']);
     });
 
-$request = ServerRequestFactory::fromGlobals();
+$request = $psr17Factory->fromGlobals();
 $response = $app->handle($request);
 (new SapiEmitter)->emit($response);
 
@@ -54,3 +54,6 @@ $response = $app->handle($request);
 ### Install
 
 `composer require alexpts/psr15-next`
+
+
+### Todo: add more examples
